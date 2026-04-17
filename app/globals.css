@@ -43,6 +43,20 @@
   --color-cream-dark: #D4CFC7;
   --color-text: #2C1810;
   --color-text-light: #EAE6DF;
+
+  /* Z-INDEX STACK */
+  --z-base: 1;
+  --z-sticky: 40;
+  --z-navbar: 100;
+  --z-drawer-overlay: 200;
+  --z-drawer: 300;
+  --z-selection-drawer: 250; /* DEBAJO del nav drawer */
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-cursor: 10000;   /* Must be above body::after grain (9998) and preloader (9999) */
+  --z-preloader: 9999;
+  
+  --navbar-height: 92px; /* 36px barra superior + 56px navbar principal */
 }
 
 *, *::before, *::after {
@@ -238,16 +252,69 @@ body::after {
   animation: banu-shimmer 1.8s ease-in-out infinite;
 }
 
-.nav-link {
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  transition: letter-spacing 0.4s ease, opacity 0.3s ease;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+
+
+@media (max-width: 1024px) {
+  .catalog-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .brands-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
 }
 
+@media (max-width: 768px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .brands-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .nosotros-historia-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .porque-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .servicios-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .servicios-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .pdp-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .pdp-grid > div:first-child {
+    position: relative !important;
+    height: 70vw !important;
+    top: 0 !important;
+  }
+  .suggested-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+.nav-link {
+  display: inline-block;
+  letter-spacing: 0.15em;
+  transition: letter-spacing 400ms cubic-bezier(0.25, 0.1, 0.25, 1),
+              opacity 200ms ease;
+}
 .nav-link:hover {
-  letter-spacing: 0.3em;
-  opacity: 1;
+  letter-spacing: 0.28em;
+  opacity: 0.7;
 }

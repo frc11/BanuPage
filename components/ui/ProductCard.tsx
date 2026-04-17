@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +22,7 @@ export interface ProductCardProps {
   index?: number;
   showPerformance?: boolean;
   showButton?: boolean;
+  showTags?: boolean;
   priority?: boolean;
 }
 
@@ -32,8 +33,10 @@ export function ProductCard({
   index = 0,
   showPerformance = true,
   showButton = true,
+  showTags = true,
   priority = false
 }: ProductCardProps) {
+  const [hovered, setHovered] = useState(false);
   const addItem = useSelectionStore((s) => s.addItem);
   const isSelected = useIsInSelection(product._id);
 
@@ -64,6 +67,11 @@ export function ProductCard({
   const waMessage = `Hola Banū, quiero consultar sobre ${product.brand?.title ? `${product.brand.title} ` : ""}${product.name}`;
   const waUrl = `https://wa.me/5493814665503?text=${encodeURIComponent(waMessage)}`;
 
+  // Descuento en %
+  const discountPct = product.price?.isOnSale && product.price?.discountPrice && product.price?.basePrice
+    ? Math.round((1 - product.price.discountPrice / product.price.basePrice) * 100)
+    : null;
+
   return (
     <div className="group flex flex-col bg-transparent border-none shadow-none w-[220px] md:w-[280px] shrink-0 overflow-hidden relative">
       
@@ -80,7 +88,28 @@ export function ProductCard({
       >
         {/* Imagen del Frasco */}
         {product.imageUrl ? (
-          <div className="relative w-full aspect-[3/4] bg-[var(--color-cream-dark)] overflow-hidden">
+          <div 
+            className="relative w-full aspect-[3/4] bg-[var(--color-cream-dark)] overflow-hidden"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            style={{ filter: hovered ? 'saturate(1)' : 'saturate(0.88)', transition: 'filter 500ms ease' }}
+          >
+            {product.hoverImageUrl && (
+              <RevealImage
+                src={product.hoverImageUrl}
+                alt={`${product.name} lifestyle`}
+                fill
+                unoptimized
+                priority={priority}
+                className="object-cover p-0"
+                style={{
+                  opacity: hovered ? 1 : 0,
+                  transition: 'opacity 500ms ease-out',
+                  position: 'absolute',
+                  zIndex: 2
+                }}
+              />
+            )}
             <RevealImage
               src={product.imageUrl}
               alt={product.name}
@@ -88,8 +117,37 @@ export function ProductCard({
               unoptimized
               priority={priority}
               delay={index * 0.08}
-              className="object-contain p-6 transition-transform duration-[600ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-[1.04]"
+              className="object-contain p-6"
+              style={{
+                opacity: (product.hoverImageUrl && hovered) ? 0 : 1,
+                transform: hovered ? 'scale(1.04)' : 'scale(1)',
+                transition: 'opacity 500ms ease-out, transform 600ms cubic-bezier(0.25,0.1,0.25,1)',
+                position: 'absolute',
+                zIndex: 1
+              }}
             />
+
+            {/* Badge etiqueta — overlay top-left */}
+            {product.badge && (
+              <div style={{
+                position: 'absolute', top: '0.625rem', left: '0.625rem', zIndex: 3, pointerEvents: 'none'
+              }}>
+                <ProductBadge badge={product.badge} theme={theme} />
+              </div>
+            )}
+
+            {/* Badge descuento — overlay top-right */}
+            {discountPct && (
+              <div style={{
+                position: 'absolute', top: '0.625rem', right: '0.625rem', zIndex: 3,
+                background: 'var(--color-dark)', padding: '0.2rem 0.5rem', pointerEvents: 'none'
+              }}>
+                <span style={{
+                  fontFamily: 'var(--font-dm-sans)', fontSize: '0.58rem',
+                  letterSpacing: '0.12em', fontWeight: 600, color: 'var(--color-gold)'
+                }}>-{discountPct}%</span>
+              </div>
+            )}
           </div>
         ) : (
           <div className="relative w-full aspect-[3/4] bg-[var(--color-cream-dark)] flex items-center justify-center overflow-hidden">
@@ -104,8 +162,7 @@ export function ProductCard({
       {/* Info */}
       <div className="flex flex-col pt-4 flex-grow">
         
-        {/* 2. Badge */}
-        {product.badge && <ProductBadge badge={product.badge} theme={theme} />}
+        {/* 2. Badge — MOVIDO A OVERLAY DE IMAGEN (ver arriba) */}
 
         {/* 3. Marca & Inspiración */}
         <div className="mb-2 mt-1">
@@ -142,7 +199,7 @@ export function ProductCard({
         </div>
 
         {/* 6. Rendimiento */}
-        {showPerformance && (
+        {showPerformance && product.performance && (
           <div className="mt-4">
             <PerformanceBars 
               longevity={product.performance.longevity} 
@@ -152,8 +209,8 @@ export function ProductCard({
           </div>
         )}
 
-        {/* 6.5 Occasion Tags */}
-        {product.tags && product.tags.length > 0 && (
+        {/* 6.5 Occasion Tags — solo cuando showTags=true */}
+        {showTags && product.tags && product.tags.length > 0 && (
           <div className="mt-2 scale-75 origin-left overflow-hidden">
             <OccasionTags tags={product.tags} theme={theme} />
           </div>

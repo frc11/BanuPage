@@ -49,7 +49,7 @@ export function Marquee({
       */}
       <div 
         className={cn(
-          "w-max flex flex-row shrink-0 justify-around gap-16 px-8",
+          "w-max flex flex-row shrink-0 justify-start gap-16 px-8",
           alignClass,
           directionClass,
           "group-hover:[animation-play-state:paused]"
@@ -65,7 +65,7 @@ export function Marquee({
       */}
       <div 
         className={cn(
-          "w-max flex flex-row shrink-0 justify-around gap-16 px-8",
+          "w-max flex flex-row shrink-0 justify-start gap-16 px-8",
           alignClass,
           directionClass,
           "group-hover:[animation-play-state:paused]"

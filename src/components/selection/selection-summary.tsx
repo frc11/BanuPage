@@ -40,6 +40,7 @@ export function SelectionSummary() {
 
   const items = useSelectionStore((s) => s.items);
   const generateWhatsAppUrl = useSelectionStore((s) => s.generateWhatsAppUrl);
+  const addToast = useSelectionStore((s) => s.addToast);
 
   // Suma referencial — sólo items con precio > 0
   const totalReferencial = items.reduce(
@@ -49,6 +50,10 @@ export function SelectionSummary() {
   const hasKnownPrices = items.some((item) => item.price > 0);
 
   const handleWhatsApp = () => {
+    if (items.length === 0) {
+      addToast('Agregá al menos un perfume', 'info');
+      return;
+    }
     window.open(generateWhatsAppUrl(), "_blank", "noopener,noreferrer");
   };
 

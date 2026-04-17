@@ -15,6 +15,7 @@ import { ProductInfo } from "@/src/components/pdp/product-info";
 import { ArabicPatternOverlay } from "@/components/ui/ArabicPattern";
 import { BanuLogo } from "@/components/ui/BanuLogo";
 import RevealImage from "@/src/components/ui/reveal-image";
+import SuggestedProducts from "@/src/components/pdp/suggested-products-pdp";
 
 // ─── Static Params (ISR + prerender en build) ─────────────────────────────────
 
@@ -75,80 +76,87 @@ export default async function ProductPage({
   // Normalización via Mapper (Arquitectura Defensiva)
   const product = mapSanityPerfume(rawProduct);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    brand: {
+      '@type': 'Brand',
+      name: product.brand?.title ?? 'Banū Scents'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: product.price?.basePrice ?? 0,
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Banū Scents'
+      }
+    },
+    ...(product.imageUrl && { image: product.imageUrl }),
+    ...(product.inspiredBy && { description: `Inspirado en ${product.inspiredBy}` })
+  };
+
   return (
-    <main className="min-h-screen bg-[var(--color-cream)] pt-[86px]">
-      {/* Breadcrumb */}
-      <div className="px-6 lg:px-12 py-6 border-b border-[var(--color-dark)]/8">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 font-sans text-[0.6rem] tracking-[0.2em] uppercase text-[var(--color-dark)] opacity-40 hover:opacity-80 transition-opacity duration-200"
-        >
-          <ArrowLeft size={12} strokeWidth={1.5} />
-          VOLVER AL CATÁLOGO
-        </Link>
-      </div>
+    <div style={{ background: 'var(--color-cream)' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
+      {/* LAYOUT SPLIT — dos columnas */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '58% 42%',
+        minHeight: '100vh',
+        paddingTop: 'var(--navbar-height)'
+      }}
+      className="pdp-grid"
+      >
 
-      {/* Product Grid — 2 columnas en desktop, apilado en mobile */}
-      <section className="max-w-6xl mx-auto px-6 lg:px-12 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-
-        {/* ── Columna Izquierda: Imagen ─────────────────────────────────── */}
-        <div className="lg:sticky lg:top-[110px]">
-          <div className="relative w-full aspect-[3/4] bg-[var(--color-cream-dark)] overflow-hidden">
-            <ArabicPatternOverlay opacity={0.05} color="dark" />
-
-            {product.imageUrl ? (
-              <RevealImage
-                src={product.imageUrl}
-                alt={product.name}
-                fill
-                unoptimized
-                priority
-                className="object-contain p-12 relative z-10"
-              />
-            ) : (
-              /* Fallback elegante cuando no hay imagen en el CMS */
+        {/* COLUMNA IZQUIERDA — GALERÍA */}
+        <div style={{
+          position: 'sticky',
+          top: 'var(--navbar-height)',
+          height: 'calc(100vh - var(--navbar-height))',
+          background: 'var(--color-cream-dark)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden'
+        }}>
+          {product.imageUrl ? (
+            <RevealImage
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              priority
+              style={{ objectFit: 'contain', padding: '8%' }}
+            />
+          ) : (
+            // FALLBACK elegante cuando no hay imagen
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="w-32 opacity-25">
-                  <BanuLogo theme="dark" />
-                </div>
+              <div className="w-[80px] opacity-20">
+                <BanuLogo theme="light" />
               </div>
-            )}
-
-            {/* Marca badge superpuesto — esquina superior izquierda */}
-            {product.brand?.logoUrl && (
-              <div className="absolute top-6 left-6 z-20 w-14 h-14 bg-white/80 backdrop-blur-sm flex items-center justify-center p-2">
-                <Image
-                  src={product.brand.logoUrl}
-                  alt={product.brand.title}
-                  width={40}
-                  height={40}
-                  unoptimized
-                  className="object-contain"
-                />
               </div>
-            )}
-          </div>
-
-          {/* Nombre de marca debajo de imagen — sólo mobile */}
-          {product.brand?.title && (
-            <p className="lg:hidden mt-4 font-sans text-[0.6rem] tracking-[0.3em] uppercase text-[var(--color-gold)] text-center">
-              {product.brand.title}
-            </p>
           )}
         </div>
 
-        {/* ── Columna Derecha: Info + CTAs (client component) ──────────── */}
-        <div className="flex flex-col justify-center">
+        {/* COLUMNA DERECHA — INFO */}
+        <div style={{
+          padding: 'clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 4rem)',
+          overflowY: 'auto'
+        }}>
           <ProductInfo product={product} />
         </div>
-      </section>
 
-      {/* Ornamento inferior */}
-      <div className="flex items-center justify-center py-16 opacity-20">
-        <div className="w-12">
-          <BanuLogo theme="dark" />
-        </div>
       </div>
-    </main>
-  );
+
+      {/* PRODUCTOS SUGERIDOS */}
+      <SuggestedProducts currentId={product._id} />
+
+    </div>
+  )
 }

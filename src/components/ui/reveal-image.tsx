@@ -14,10 +14,11 @@ interface RevealImageProps {
   className?: string
   delay?: number
   unoptimized?: boolean
+  style?: React.CSSProperties
 }
 
 export default function RevealImage({ 
-  src, alt, width, height, fill, priority, className, delay = 0, unoptimized
+  src, alt, width, height, fill, priority, className, delay = 0, unoptimized, style
 }: RevealImageProps) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-80px' })
@@ -53,7 +54,7 @@ export default function RevealImage({
           priority={priority}
           unoptimized={unoptimized}
           className={!fill ? className : undefined}
-          style={{ objectFit: 'cover' }}
+          style={style || { objectFit: 'cover' }}
         />
       </motion.div>
     </motion.div>

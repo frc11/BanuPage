@@ -102,3 +102,25 @@ export const SUGGESTED_PRODUCTS_QUERY = `*[_type == "perfume" && isFeatured == t
   "gallery": gallery[].asset->url, 
   "brand": brand->{ "title": name, "logoUrl": logo.asset->url }
 }`;
+
+export const ALL_PRODUCTS_QUERY = `
+  *[_type == "perfume"] | order(_createdAt desc) {
+    _id,
+    name,
+    "slug": slug.current,
+    badge,
+    inspiredBy,
+    price,
+    notes,
+    performance,
+    tags,
+    isFeatured,
+    "imageUrl": mainImage.asset->url,
+    "hoverImageUrl": gallery[0].asset->url,
+    "gallery": gallery[].asset->url,
+    "brand": brand->{ 
+      "title": name, 
+      "logoUrl": logo.asset->url
+    }
+  }
+`;

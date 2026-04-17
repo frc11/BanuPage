@@ -91,12 +91,26 @@ export function ProductInfo({ product }: ProductInfoProps) {
       )}
 
       {/* Nombre */}
-      <h1 className="font-serif text-[clamp(2rem,5vw,3.5rem)] font-normal text-[var(--color-dark)] leading-[1.1] mb-6">
+      <h1 className="font-serif text-[clamp(2rem,5vw,3.5rem)] font-normal text-[var(--color-dark)] leading-[1.1] mb-2">
         {product.name}
       </h1>
 
+      {/* 4. inspiredBy */}
+      {product.inspiredBy && (
+        <p style={{
+          fontFamily: 'var(--font-dm-sans)',
+          fontSize: '0.72rem',
+          fontStyle: 'italic',
+          color: 'var(--color-gold)',
+          opacity: 0.7,
+          marginBottom: '1.5rem'
+        }}>
+          Inspirado en {product.inspiredBy}
+        </p>
+      )}
+
       {/* Precio */}
-      <div className="mb-10 pb-8 border-b border-[var(--color-dark)]/10">
+      <div className="mb-8 pb-8 border-b border-[var(--color-dark)]/10">
         <ProductPrice 
           basePrice={product.price?.basePrice}
           discountPrice={product.price?.discountPrice}
@@ -106,8 +120,90 @@ export function ProductInfo({ product }: ProductInfoProps) {
         />
       </div>
 
-      {/* 7. Links de Servicio */}
-      <div className="mt-8 flex flex-col gap-4 border-t border-[var(--color-dark)]/10 pt-8">
+      {/* 7. BOTÓN AGREGAR A MI SELECCIÓN */}
+      <motion.button
+        onClick={handleSelectionToggle}
+        whileHover={{ opacity: 0.85 }}
+        style={{
+          width: '100%',
+          background: isInSelection ? 'var(--color-gold)' : 'var(--color-dark)',
+          color: 'var(--color-cream)',
+          border: 'none',
+          padding: '1rem 2rem',
+          fontFamily: 'var(--font-dm-sans)',
+          fontSize: '0.72rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.625rem',
+          transition: 'background 300ms ease',
+          marginBottom: '0.75rem'
+        }}
+      >
+        <AnimatePresence mode="wait">
+          {isInSelection ? (
+            <motion.span
+              key="added"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.2 }}
+            >
+              ✓ En tu selección
+            </motion.span>
+          ) : (
+            <motion.span
+              key="add"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.2 }}
+            >
+              + Agregar a mi selección
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+      {/* 8. BOTÓN CONSULTAR POR WHATSAPP */}
+      <a
+        href={waUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          padding: '1rem 2rem',
+          border: '1px solid var(--color-dark)',
+          color: 'var(--color-dark)',
+          background: 'transparent',
+          fontFamily: 'var(--font-dm-sans)',
+          fontSize: '0.72rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          transition: 'background 300ms ease',
+          marginBottom: '2rem'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(44,24,16,0.05)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent'
+        }}
+      >
+        <WhatsAppIcon size={16} />
+        <span style={{ marginLeft: '0.625rem' }}>Consultar por WhatsApp</span>
+      </a>
+
+      {/* 9. Links de Servicio */}
+      <div className="flex flex-col gap-4 pt-4">
         <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
           <Truck size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
           <span>Envío prioritario a todo el país</span>
@@ -122,8 +218,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </div>
       </div>
 
-      {/* 8. Descripción (Notas Olfativas como fallback) */}
-      <div className="mt-10">
+      <div className="mt-8 mb-8 border-b border-[var(--color-dark)]/10" />
+
+      {/* 11. Descripción (Notas Olfativas) */}
+      <div>
         <p className="font-sans text-[0.6rem] tracking-[0.2em] uppercase opacity-40 mb-4">Notas Olfativas</p>
         <div className="grid grid-cols-1 gap-6">
           <div className="flex flex-col gap-1">

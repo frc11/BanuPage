@@ -113,7 +113,8 @@ export function MiniSelectionDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden fixed inset-0 z-[49] bg-[rgba(44,24,16,0.4)]"
+            className="md:hidden fixed inset-0 bg-[rgba(44,24,16,0.4)]"
+            style={{ zIndex: 'calc(var(--z-selection-drawer) - 1)' }}
             onClick={closeDrawer}
             aria-hidden="true"
           />
@@ -142,12 +143,12 @@ export function MiniSelectionDrawer() {
             className="fixed-bottom"
             style={{
               position: "fixed",
-              top: "60px",
+              top: "var(--navbar-height)",
               right: 0,
-              zIndex: 50,
+              zIndex: "var(--z-selection-drawer)",
               width: "380px",
               maxWidth: "100vw",
-              maxHeight: "calc(100vh - 60px)",
+              maxHeight: "calc(100vh - var(--navbar-height))",
               overflowY: "auto",
               backgroundColor: "var(--color-cream)",
               boxShadow: "-4px 0 24px rgba(44,24,16,0.12)",
@@ -340,6 +341,7 @@ export function MiniSelectionDrawer() {
             <div
               style={{
                 padding: "1.5rem",
+                paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))",
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.75rem",

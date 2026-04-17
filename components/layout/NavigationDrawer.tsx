@@ -41,9 +41,9 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
   }, [isOpen]);
 
   const primaryLinks = [
-    { label: 'Catálogo', href: '/#catalogo' },
-    { label: 'Marcas', href: '/#marcas' },
-    { label: 'Nosotros', href: '/#nosotros' },
+    { label: 'Catálogo', href: '/catalogo' },
+    { label: 'Marcas', href: '/marcas' },
+    { label: 'Nosotros', href: '/nosotros' },
     {
       label: 'Mi Selección',
       href: '/seleccion',
@@ -61,8 +61,8 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[60] cursor-pointer"
-            style={{ backgroundColor: 'rgba(44, 24, 16, 0.4)' }}
+            className="fixed inset-0 cursor-pointer"
+            style={{ backgroundColor: 'rgba(44, 24, 16, 0.4)', zIndex: 'var(--z-drawer-overlay)' }}
             onClick={onClose}
             aria-hidden="true"
           />
@@ -78,8 +78,8 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
             onDragEnd={(_, info) => {
               if (info.offset.x < -80) onClose();
             }}
-            className="fixed top-0 left-0 bottom-0 z-[70] w-full max-w-[480px] h-full bg-[var(--color-cream)] shadow-2xl flex flex-col overflow-y-auto"
-            style={{ width: 'var(--nav-drawer-width, 100vw)' }}
+            className="fixed top-0 left-0 bottom-0 w-full max-w-[480px] h-full bg-[var(--color-cream)] shadow-2xl flex flex-col overflow-y-auto"
+            style={{ width: 'var(--nav-drawer-width, 100vw)', zIndex: 'var(--z-drawer)' }}
           >
             {/* Close */}
             <div className="flex justify-end items-center p-6 lg:p-8">
@@ -123,15 +123,19 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               <div className="w-full h-[1px] bg-[var(--color-dark)] opacity-15 my-[1.5rem]" />
 
               <ul className="flex flex-col space-y-4">
-                {['Servicios', 'Contacto', 'FAQ'].map((item) => (
-                  <li key={item}>
+                {[
+                  { label: 'Servicios', href: '/nosotros#servicios' },
+                  { label: 'Contacto', href: 'https://wa.me/5493814665503' },
+                  { label: 'FAQ', href: '/#faq' }
+                ].map((item) => (
+                  <li key={item.label}>
                     <Link
-                      href="#"
+                      href={item.href}
                       onClick={onClose}
                       className="nav-link"
                     >
                       <span className="font-sans text-[0.8rem] text-[var(--color-dark)] opacity-60 underline underline-offset-4 decoration-1">
-                        {item}
+                        {item.label}
                       </span>
                     </Link>
                   </li>

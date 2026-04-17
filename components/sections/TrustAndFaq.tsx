@@ -40,9 +40,45 @@ export function TrustAndFaq({ trustItems, faqItems }: TrustAndFaqProps) {
         
         {/* Trust Section Wrapper */}
         <div className="w-full max-w-[1000px] flex flex-col items-center px-6 lg:px-8">
-          {/* Separador Superior - Estricto Centrado */}
-          <div className="w-32 h-px bg-[var(--color-gold)] opacity-30 mb-20" />
-          
+
+          {/* Encabezado "Por qué elegir Banū" */}
+          <div style={{
+            textAlign: 'center',
+            paddingBottom: 'clamp(2.5rem, 5vw, 4rem)',
+            position: 'relative',
+            width: '100%'
+          }}>
+            {/* Separador ornamental */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '1rem',
+              marginBottom: '2rem'
+            }}>
+              <div style={{ width: '40px', height: '1px', background: 'var(--color-gold)', opacity: 0.3 }} />
+              <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
+                <rect x="1" y="1" width="6" height="6" transform="rotate(45 4 4)"
+                  fill="none" stroke="#8B7355" strokeWidth="1" opacity="0.5" />
+              </svg>
+              <div style={{ width: '40px', height: '1px', background: 'var(--color-gold)', opacity: 0.3 }} />
+            </div>
+
+            <RevealText
+              text="Por qué elegir Banū"
+              as="h2"
+              style={{
+                fontFamily: 'var(--font-cormorant)',
+                fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
+                fontWeight: 300,
+                color: 'var(--color-cream)',
+                letterSpacing: '0.03em',
+                textAlign: 'center',
+                width: '100%'
+              }}
+            />
+          </div>
+
           <TrustGrid items={trust} />
         </div>
         

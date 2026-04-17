@@ -8,10 +8,12 @@ import { NavigationDrawer } from '@/components/layout/NavigationDrawer';
 import { useSelectionStore, useSelectionCount } from '@/src/store/selection-store';
 import { useHydrated } from '@/src/hooks/use-hydrated';
 import { cn } from '@/lib/utils';
+import SearchModal from '@/src/components/ui/search-modal';
 
 export function Navbar() {
   const [scrollState, setScrollState] = useState<0 | 1 | 2>(0);
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const { scrollY } = useScroll();
 
@@ -27,23 +29,74 @@ export function Navbar() {
   });
 
   return (
-    <header className="fixed top-0 left-0 right-0 w-full z-[60] flex flex-col">
+    <header className="fixed top-0 left-0 right-0 w-full flex flex-col" style={{ zIndex: 'var(--z-navbar)' }}>
       {/* Topbar utilitaria */}
-      <div className="bg-[#1A0E08] h-[36px] flex items-center px-6 lg:px-12 w-full justify-start">
+      {/* Topbar utilitaria */}
+      <div style={{
+        background: 'var(--color-dark)',
+        height: '36px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',  /* CENTRADO — no a la izquierda */
+        position: 'relative',
+        padding: '0 1.5rem'
+      }}>
         <a
           href="https://wa.me/5493814665503"
           target="_blank"
           rel="noopener noreferrer"
-          className="nav-link opacity-80 hover:opacity-100 transition-opacity duration-200"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.625rem',
+            textDecoration: 'none'
+          }}
         >
-          <span className="text-[var(--color-gold)] mr-1">+</span> CONTACTANOS POR WHATSAPP
+          {/* Prefijo dorado */}
+          <span style={{
+            color: 'var(--color-gold)',
+            fontSize: '0.6rem',
+            letterSpacing: '0.1em'
+          }}>+</span>
+
+          {/* Texto */}
+          <span style={{
+            fontFamily: 'var(--font-dm-sans)',
+            fontSize: '0.62rem',
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: 'var(--color-cream)',
+            opacity: 0.75,
+            transition: 'opacity 200ms ease'
+          }}>
+            Contactanos por WhatsApp
+          </span>
+
+          {/* Separador decorativo */}
+          <span style={{
+            color: 'var(--color-gold)',
+            opacity: 0.3,
+            fontSize: '0.5rem',
+            margin: '0 0.25rem'
+          }}>◆</span>
+
+          {/* Horario o tagline */}
+          <span style={{
+            fontFamily: 'var(--font-dm-sans)',
+            fontSize: '0.6rem',
+            letterSpacing: '0.15em',
+            color: 'var(--color-cream)',
+            opacity: 0.4
+          }}>
+            Respuesta en menos de 24hs
+          </span>
         </a>
       </div>
 
       {/* Navbar Principal */}
       <motion.nav
         className={cn(
-          "w-full h-[50px] flex items-center justify-between px-6 lg:px-12 transition-all duration-400 ease-in-out",
+          "w-full h-[85px] md:h-[130px] flex items-center justify-between px-6 lg:px-12 transition-all duration-400 ease-in-out",
           scrollState === 2
             ? "bg-[var(--color-dark)]"
             : scrollState === 1
@@ -63,6 +116,7 @@ export function Navbar() {
         <div className="flex-1 flex justify-end items-center gap-[1.5rem] text-[var(--color-text-light)]">
           <button
             aria-label="Buscar"
+            onClick={() => setSearchOpen(true)}
             className="opacity-80 hover:opacity-100 transition-opacity duration-200"
           >
             <Search size={18} strokeWidth={1.5} />
@@ -80,17 +134,34 @@ export function Navbar() {
             {mounted && (
               <AnimatePresence>
                 {count > 0 && (
-                  <motion.span
+                  <motion.div
                     key={count}
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.5, opacity: 0 }}
-                    transition={{ duration: 0.2, type: "spring" as const, stiffness: 300 }}
-                    className="absolute -top-[6px] -right-[6px] w-4 h-4 rounded-full flex items-center justify-center bg-[var(--color-gold)] text-[var(--color-text-light)] font-sans font-semibold leading-none"
-                    style={{ fontSize: '0.6rem' }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                    style={{
+                      position: 'absolute',
+                      top: '-7px',
+                      right: '-7px',
+                      width: '16px',
+                      height: '16px',
+                      background: 'var(--color-gold)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
                   >
-                    {count > 9 ? '9+' : count}
-                  </motion.span>
+                    <span style={{
+                      fontFamily: 'var(--font-dm-sans)',
+                      fontSize: '0.5rem',
+                      fontWeight: 600,
+                      color: 'var(--color-cream)',
+                      lineHeight: 1
+                    }}>
+                      {count > 9 ? '9+' : count}
+                    </span>
+                  </motion.div>
                 )}
               </AnimatePresence>
             )}
@@ -124,6 +195,7 @@ export function Navbar() {
 
       {/* Navigation Drawer lateral izquierdo */}
       <NavigationDrawer isOpen={isNavDrawerOpen} onClose={() => setIsNavDrawerOpen(false)} />
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

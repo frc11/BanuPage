@@ -7,7 +7,7 @@ export function WhatsAppButton() {
   const waUrl = "https://wa.me/5493814665503";
 
   return (
-    <div className="fixed bottom-6 right-6 z-[90] fixed-bottom pointer-events-auto">
+    <div className="fixed bottom-6 right-6 fixed-bottom pointer-events-auto" style={{ zIndex: 'var(--z-toast)' }}>
       <div className="relative flex items-center justify-center">
         {/* Ping Animation Backdrop */}
         <motion.div

@@ -83,10 +83,11 @@ export function CustomCursor() {
     <>
       {/* DOT */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 rounded-full pointer-events-none"
         style={{
           width: 5,
           height: 5,
+          zIndex: 'var(--z-cursor)' as unknown as number,
         }}
         animate={{
           x: pos.x,
@@ -103,7 +104,8 @@ export function CustomCursor() {
 
       {/* RING */}
       <motion.div
-        className="fixed top-0 left-0 bg-transparent rounded-full pointer-events-none z-[9999] border"
+        className="fixed top-0 left-0 bg-transparent rounded-full pointer-events-none border"
+        style={{ zIndex: 'var(--z-cursor)' as unknown as number }}
         animate={{
           x: pos.x,
           y: pos.y,

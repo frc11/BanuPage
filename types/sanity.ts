@@ -34,6 +34,7 @@ export interface PerfumeData {
   tags: string[];
   isFeatured: boolean;
   imageUrl?: string;
+  hoverImageUrl?: string;
   gallery?: string[];
   brand?: {
     title: string;

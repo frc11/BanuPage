@@ -29,7 +29,7 @@ export function ScrollProgress() {
         width: `${progress}%`,
         height: "3px",
         backgroundColor: "var(--color-gold)",
-        zIndex: 10000,
+        zIndex: "var(--z-navbar)",
         pointerEvents: "none",
       }}
       transition={{ duration: 0.1, ease: "linear" }}

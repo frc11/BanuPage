@@ -12,9 +12,16 @@ export interface SelectionItem {
   imageUrl: string; // URL ya resuelta con urlFor()
 }
 
+export interface Toast {
+  id: string;
+  message: string;
+  variant: 'success' | 'info' | 'error';
+}
+
 interface SelectionStore {
   items: SelectionItem[];
   isOpen: boolean;
+  toasts: Toast[];
 
   // Actions
   addItem: (item: SelectionItem) => void;
@@ -22,6 +29,8 @@ interface SelectionStore {
   clearSelection: () => void;
   openDrawer: () => void;
   closeDrawer: () => void;
+  addToast: (message: string, variant?: Toast['variant']) => void;
+  removeToast: (id: string) => void;
 
   // Computed (implementados como getters para acceso sin selector)
   totalItems: () => number;
@@ -39,19 +48,37 @@ export const useSelectionStore = create<SelectionStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      toasts: [],
 
-      addItem: (item) =>
-        set((state) => {
-          const exists = state.items.some((i) => i.id === item.id);
-          // Si ya existe, sólo abre el drawer sin duplicar
-          if (exists) return { isOpen: true };
-          return { items: [...state.items, item], isOpen: true };
-        }),
+      addToast: (message, variant = 'info') => {
+        const id = Math.random().toString(36).slice(2);
+        set((state) => ({ toasts: [...state.toasts, { id, message, variant }] }));
+        setTimeout(() => {
+          set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
+        }, 3000);
+      },
 
-      removeItem: (id) =>
+      removeToast: (id) =>
+        set((state) => ({
+          toasts: state.toasts.filter((t) => t.id !== id),
+        })),
+
+      addItem: (item) => {
+        const exists = get().items.some((i) => i.id === item.id);
+        if (exists) {
+          set({ isOpen: true });
+          return;
+        }
+        set((state) => ({ items: [...state.items, item], isOpen: true }));
+        get().addToast('Agregado a tu selección', 'success');
+      },
+
+      removeItem: (id) => {
         set((state) => ({
           items: state.items.filter((i) => i.id !== id),
-        })),
+        }));
+        get().addToast('Eliminado de tu selección', 'info');
+      },
 
       clearSelection: () => set({ items: [] }),
 

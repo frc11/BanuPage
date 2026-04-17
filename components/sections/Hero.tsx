@@ -40,6 +40,12 @@ export function Hero({
   ctaText = "DESCUBRIR",
   ctaLink = "#explore",
 }: HeroProps) {
+  const displayTitle = (!title || title.toLowerCase() === 'hola') 
+    ? "Descubrí el arte\ndel perfume árabe" 
+    : title;
+
+  const displaySubtitle = subtitle || "Fragancias árabes auténticas";
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
@@ -54,10 +60,7 @@ export function Hero({
     if (currentVideo) {
       currentVideo.muted = true; 
       currentVideo.play().catch((error) => {
-        console.warn(
-          "Autoplay bloqueado por el navegador, esperando interacción:",
-          error
-        );
+        // Silenciar autoplay error
       });
     }
   }, [currentIndex, activeVideos]);
@@ -108,15 +111,15 @@ export function Hero({
       <div className="relative z-20 flex flex-col items-center w-full max-w-4xl px-6 text-center">
         <RevealText
           as="h1"
-          text={title}
-          className="font-serif text-[var(--color-cream)] font-light text-[clamp(3.5rem,10vw,8rem)] tracking-[0.1em] leading-[0.9] mb-8"
+          text={displayTitle}
+          className="font-serif text-[var(--color-cream)] font-light text-[clamp(3.5rem,10vw,8rem)] tracking-[0.1em] leading-[0.9] mb-8 whitespace-pre-line"
           delay={0.3}
         />
 
-        {subtitle && (
+        {displaySubtitle && (
           <RevealText
             as="p"
-            text={subtitle}
+            text={displaySubtitle}
             className="font-sans text-[var(--color-cream)] text-[clamp(0.75rem,1.5vw,0.9rem)] tracking-[0.35em] uppercase opacity-70 mb-12 max-w-[80%] mx-auto"
             delay={0.65}
           />

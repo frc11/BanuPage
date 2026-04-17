@@ -57,19 +57,31 @@ export function Footer() {
           {/* Columna 3 */}
           <div className="flex flex-col items-center w-full">
             <h4 className="font-sans text-[0.65rem] tracking-[0.25em] uppercase text-[var(--color-text-light)] opacity-40 mb-[1rem]">SUSCRIPCIÓN</h4>
-            <form className="flex flex-col items-center w-full max-w-[280px]" onSubmit={(e) => e.preventDefault()}>
-              <input 
-                type="email" 
-                placeholder="Email" 
-                className="w-full bg-transparent border-0 border-b border-[var(--color-text-light)] border-opacity-30 pb-2 font-sans text-[0.8rem] text-[var(--color-text-light)] placeholder:text-[var(--color-text-light)] placeholder:opacity-40 focus:outline-none focus:border-opacity-100 transition-all rounded-none text-center"
-              />
-              <button 
-                type="submit" 
-                className="nav-link mt-4 text-[0.8rem] text-[var(--color-text-light)] opacity-70"
-              >
-                + SUSCRIBIRSE
-              </button>
-            </form>
+            <a 
+              href="https://wa.me/5493814665503?text=Hola%20Banū%2C%20quiero%20suscribirme%20a%20las%20novedades"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontFamily: 'var(--font-dm-sans)',
+                fontSize: '0.7rem',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--color-cream)',
+                opacity: 0.6,
+                textDecoration: 'none',
+                borderBottom: '1px solid rgba(234,230,223,0.2)',
+                paddingBottom: '0.25rem',
+                transition: 'opacity 200ms ease'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.6' }}
+            >
+              + Suscribirse vía WhatsApp
+            </a>
           </div>
         </div>
       </div>

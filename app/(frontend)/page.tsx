@@ -22,6 +22,15 @@ import { FeaturedMarquee } from '@/components/sections/FeaturedMarquee';
 import { TrustAndFaq } from '@/components/sections/TrustAndFaq';
 import { ReviewsSection } from '@/components/sections/ReviewsSection';
 import { SectionDivider } from '@/src/components/ui/section-divider';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Inicio',
+  description: 'Descubrí el arte del perfume árabe. Fragancias auténticas de las mejores casas orientales, disponibles en Argentina.',
+  openGraph: {
+    type: 'website'
+  }
+};
 
 export default async function Home() {
   // Execución paralela de todas las consultas GROQ para minimizar latencia SSR
@@ -34,7 +43,6 @@ export default async function Home() {
     sanityFetch<ReviewData[] | null>({ query: REVIEWS_QUERY }),
   ]);
 
-  console.log("Raw Hero Data:", heroData);
 
   return (
     <main className="relative flex flex-col items-center bg-[var(--color-cream)] w-full overflow-hidden">
@@ -44,19 +52,19 @@ export default async function Home() {
         videoUrls={heroData?.videoUrls ?? []}
       />
       
-      <SectionDivider variant="pattern" from="dark" to="cream" />
+      <SectionDivider variant="ornament" />
       
-      <BrandsMarquee />
+      <BrandsMarquee brands={brandsData ?? []} />
       
       <SectionDivider variant="pattern" from="cream" to="dark" />
       
-      <FeaturedMarquee />
+      <FeaturedMarquee products={productsData ?? []} />
       
-      <SectionDivider variant="line" from="dark" to="dark" />
+      <SectionDivider variant="pattern" from="dark" to="cream" />
       
       <TrustAndFaq trustItems={trustData} faqItems={faqData} />
       
-      <SectionDivider variant="pattern" from="dark" to="cream" />
+      <SectionDivider variant="ornament" />
       
       <ReviewsSection reviews={reviewsData} />
       

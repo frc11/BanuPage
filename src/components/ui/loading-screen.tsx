@@ -127,7 +127,8 @@ export default function LoadingScreen() {
             opacity: 0,
             transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: 0.1 },
           }}
-          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[var(--color-dark)] pointer-events-auto"
+          className="fixed inset-0 flex flex-col items-center justify-center bg-[var(--color-dark)] pointer-events-auto"
+          style={{ zIndex: 'var(--z-preloader)' as unknown as number }}
         >
           {/* 1. LOGO SVG ANIMADO */}
           <div className="w-[100px] md:w-[140px] flex items-center justify-center relative">

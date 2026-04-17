@@ -18,9 +18,9 @@ export function BanuLogo({ theme = 'dark', className, asLink = true }: BanuLogoP
     <Image
       src={logoSrc}
       alt="BANŪ"
-      width={180}
-      height={28}
-      className="w-auto h-[28px] object-contain"
+      width={600}
+      height={100}
+      className={cn("w-auto h-[60px] md:h-[100px] object-contain", className)}
       priority
       unoptimized
     />
