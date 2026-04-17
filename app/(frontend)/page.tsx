@@ -26,14 +26,15 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Inicio',
-  description: 'Descubrí el arte del perfume árabe. Fragancias auténticas de las mejores casas orientales, disponibles en Argentina.',
+  description:
+    'Descubrí el arte del perfume árabe. Fragancias auténticas de las mejores casas orientales, disponibles en Argentina.',
   openGraph: {
-    type: 'website'
-  }
+    type: 'website',
+  },
 };
 
 export default async function Home() {
-  // Execución paralela de todas las consultas GROQ para minimizar latencia SSR
+  // Ejecución paralela de consultas GROQ para minimizar latencia SSR
   const [heroData, brandsData, productsData, trustData, faqData, reviewsData] = await Promise.all([
     sanityFetch<HeroSectionData>({ query: HERO_QUERY }),
     sanityFetch<BrandData[]>({ query: BRANDS_QUERY }),
@@ -43,6 +44,8 @@ export default async function Home() {
     sanityFetch<ReviewData[] | null>({ query: REVIEWS_QUERY }),
   ]);
 
+  const heroTitle = heroData?.title?.trim() ?? '';
+  const hasHeroContent = heroTitle !== '' && heroTitle.toLowerCase() !== 'hola';
 
   return (
     <main className="relative flex flex-col items-center bg-[var(--color-cream)] w-full overflow-hidden">
@@ -50,24 +53,25 @@ export default async function Home() {
         title={heroData?.title}
         subtitle={heroData?.subtitle}
         videoUrls={heroData?.videoUrls ?? []}
+        showContent={hasHeroContent}
       />
-      
+
       <SectionDivider variant="ornament" />
-      
+
       <BrandsMarquee brands={brandsData ?? []} />
-      
+
       <SectionDivider variant="pattern" from="cream" to="dark" />
-      
+
       <FeaturedMarquee products={productsData ?? []} />
-      
+
       <SectionDivider variant="pattern" from="dark" to="cream" />
-      
+
       <TrustAndFaq trustItems={trustData} faqItems={faqData} />
-      
+
       <SectionDivider variant="ornament" />
-      
+
       <ReviewsSection reviews={reviewsData} />
-      
+
       <SectionDivider variant="pattern" from="cream" to="dark" />
     </main>
   );

@@ -1,10 +1,14 @@
 import { createClient } from 'next-sanity';
 
-// Resolución directa de variables de entorno (asegura fallbacks de capa cero)
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'dummyProjectId';
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+// Resolucion directa de variables de entorno (asegura fallbacks de capa cero)
+const rawProjectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim();
+const projectId = rawProjectId || 'dummyprojectid';
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET?.trim() || 'production';
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01';
 const token = process.env.SANITY_API_READ_TOKEN;
+
+const sanityConfigured = Boolean(rawProjectId && rawProjectId.toLowerCase() !== 'dummyprojectid');
+let didWarnInvalidConfig = false;
 
 export const client = createClient({
   projectId,
@@ -25,10 +29,31 @@ export async function sanityFetch<QueryResponse>({
   query: string;
   params?: Record<string, unknown>;
 }): Promise<QueryResponse> {
-  return client.fetch<QueryResponse>(query, params, {
-    // Configuración profunda de Turbopack/Next cache
-    next: {
-      revalidate: 60, // ISR: Garantía absoluta de revalidar cada 60 segundos en Edge
-    },
-  });
+  if (!sanityConfigured) {
+    if (!didWarnInvalidConfig) {
+      didWarnInvalidConfig = true;
+      console.warn(
+        `[sanityFetch] Sanity deshabilitado: NEXT_PUBLIC_SANITY_PROJECT_ID no configurado o invalido. Query omitida: ${query.slice(0, 60)}...`
+      );
+    }
+    return null as QueryResponse;
+  }
+
+  try {
+    return await client.fetch<QueryResponse>(query, params, {
+      // Configuracion profunda de Turbopack/Next cache
+      next: {
+        revalidate: 60, // ISR: revalida cada 60 segundos
+      },
+    });
+  } catch (error) {
+    const statusCode =
+      typeof error === 'object' && error !== null && 'statusCode' in error
+        ? (error as { statusCode?: number }).statusCode
+        : undefined;
+
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[sanityFetch] Error al consultar Sanity (${statusCode ?? 'unknown'}): ${message}`);
+    return null as QueryResponse;
+  }
 }

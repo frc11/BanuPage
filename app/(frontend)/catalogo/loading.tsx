@@ -6,7 +6,7 @@ export default function CatalogoLoading() {
       {/* Hero skeleton */}
       <div style={{
         background: 'var(--color-dark)',
-        paddingTop: 'calc(var(--navbar-height) + 5rem)',
+        paddingTop: 'calc(var(--navbar-height) + 4rem)',
         paddingBottom: '4rem',
         display: 'flex',
         flexDirection: 'column',

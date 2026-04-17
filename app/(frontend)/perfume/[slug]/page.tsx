@@ -1,8 +1,5 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 import { sanityFetch } from "@/lib/sanity";
@@ -12,7 +9,6 @@ import {
 } from "@/lib/queries";
 import { mapSanityPerfume } from "@/lib/mappers";
 import { ProductInfo } from "@/src/components/pdp/product-info";
-import { ArabicPatternOverlay } from "@/components/ui/ArabicPattern";
 import { BanuLogo } from "@/components/ui/BanuLogo";
 import RevealImage from "@/src/components/ui/reveal-image";
 import SuggestedProducts from "@/src/components/pdp/suggested-products-pdp";
@@ -20,8 +16,13 @@ import SuggestedProducts from "@/src/components/pdp/suggested-products-pdp";
 // ─── Static Params (ISR + prerender en build) ─────────────────────────────────
 
 export async function generateStaticParams() {
-  const slugs = await sanityFetch<string[]>({ query: ALL_PRODUCT_SLUGS_QUERY });
-  return (slugs ?? []).map((slug) => ({ slug }));
+  try {
+    const slugs = await sanityFetch<string[]>({ query: ALL_PRODUCT_SLUGS_QUERY });
+    return (slugs ?? []).map((slug) => ({ slug }));
+  } catch (error) {
+    console.warn('[perfume/[slug]] generateStaticParams fallback:', error);
+    return [];
+  }
 }
 
 // ─── Dynamic Metadata ─────────────────────────────────────────────────────────
@@ -32,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const rawProduct = await sanityFetch<any>({
+  const rawProduct = await sanityFetch<unknown>({
     query: PRODUCT_BY_SLUG_QUERY,
     params: { slug },
   });
@@ -41,7 +42,7 @@ export async function generateMetadata({
     return { title: "Perfume no encontrado | Banū Scents" };
   }
 
-  const product = mapSanityPerfume(rawProduct);
+  const product = mapSanityPerfume(rawProduct as never);
   const brandPrefix = product.brand?.title ? `${product.brand.title} · ` : "";
   const activePrice = product.price.isOnSale && product.price.discountPrice ? product.price.discountPrice : product.price.basePrice;
   const priceStr = activePrice > 0 ? ` — USD ${activePrice}` : "";
@@ -65,7 +66,7 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const rawProduct = await sanityFetch<any>({
+  const rawProduct = await sanityFetch<unknown>({
     query: PRODUCT_BY_SLUG_QUERY,
     params: { slug },
   });
@@ -74,7 +75,7 @@ export default async function ProductPage({
   if (!rawProduct) notFound();
 
   // Normalización via Mapper (Arquitectura Defensiva)
-  const product = mapSanityPerfume(rawProduct);
+  const product = mapSanityPerfume(rawProduct as never);
 
   const jsonLd = {
     '@context': 'https://schema.org',

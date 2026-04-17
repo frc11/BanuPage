@@ -21,7 +21,7 @@ const dmSans = DM_Sans({
 import ToastContainer from "@/src/components/ui/toast";
 import { CustomCursor } from "@/src/components/ui/custom-cursor";
 import { ScrollProgress } from "@/src/components/ui/scroll-progress";
-import { WhatsAppButton } from "@/src/components/ui/whatsapp-button";
+import WhatsAppButton from "@/src/components/ui/whatsapp-button";
 import { MiniSelectionDrawer } from "@/src/components/selection/mini-selection-drawer";
 
 export const metadata: Metadata = {

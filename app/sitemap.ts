@@ -3,9 +3,14 @@ import { sanityFetch } from '@/lib/sanity'
 import { ALL_PRODUCT_SLUGS_QUERY } from '@/lib/queries'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const slugs = await sanityFetch<string[]>({
-    query: ALL_PRODUCT_SLUGS_QUERY
-  }) ?? []
+  let slugs: string[] = []
+  try {
+    slugs = (await sanityFetch<string[]>({
+      query: ALL_PRODUCT_SLUGS_QUERY
+    })) ?? []
+  } catch (error) {
+    console.warn('[sitemap] No se pudieron cargar slugs desde Sanity:', error)
+  }
 
   const productUrls = slugs.map(slug => ({
     url: `https://banuscents.com/perfume/${slug}`,

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { PerfumeData, BrandData } from '@/types/sanity'
@@ -10,6 +10,14 @@ import CatalogFilters from './catalog-filters'
 interface CatalogContentProps {
   products: PerfumeData[]
   brands: BrandData[]
+}
+
+interface FiltersState {
+  searchQuery: string
+  selectedBrands: string[]
+  selectedTags: string[]
+  onlyOnSale: boolean
+  sortBy: 'recommended' | 'price-asc' | 'price-desc' | 'newest'
 }
 
 const containerVariants = {
@@ -30,91 +38,97 @@ const cardVariants = {
 
 export default function CatalogContent({ products, brands }: CatalogContentProps) {
   const searchParams = useSearchParams()
-  const [filters, setFilters] = useState<{
-    searchQuery: string;
-    selectedBrands: string[];
-    selectedTags: string[];
-    onlyOnSale: boolean;
-    sortBy: 'recommended' | 'price-asc' | 'price-desc' | 'newest';
-  }>({
-    searchQuery: '',
-    selectedBrands: [],
-    selectedTags: [],
-    onlyOnSale: false,
-    sortBy: 'recommended'
-  })
 
-  // Leer parámetros de URL al montar
-  useEffect(() => {
+  const [filters, setFilters] = useState<FiltersState>(() => {
     const marca = searchParams.get('marca')
     const q = searchParams.get('q')
-    if (marca) setFilters(f => ({ ...f, selectedBrands: [marca] }))
-    if (q) setFilters(f => ({ ...f, searchQuery: q }))
-  }, [searchParams])
+
+    return {
+      searchQuery: q ?? '',
+      selectedBrands: marca ? [marca] : [],
+      selectedTags: [],
+      onlyOnSale: false,
+      sortBy: 'recommended'
+    }
+  })
 
   const filtered = useMemo(() => {
-    let res = products.filter(p => {
+    const base = products.filter((p) => {
       if (filters.searchQuery) {
-        const q = filters.searchQuery.toLowerCase();
-        if (!p.name.toLowerCase().includes(q) && !p.inspiredBy?.toLowerCase().includes(q)) return false;
+        const q = filters.searchQuery.toLowerCase()
+        if (!p.name.toLowerCase().includes(q) && !p.inspiredBy?.toLowerCase().includes(q)) {
+          return false
+        }
       }
+
       if (filters.selectedBrands.length > 0) {
-        if (!p.brand?.title || !filters.selectedBrands.includes(p.brand.title)) return false;
+        if (!p.brand?.title || !filters.selectedBrands.includes(p.brand.title)) {
+          return false
+        }
       }
+
       if (filters.selectedTags.length > 0) {
-        const hasAll = filters.selectedTags.every(t => p.tags?.includes(t));
-        if (!hasAll) return false;
+        const hasAll = filters.selectedTags.every((t) => p.tags?.includes(t))
+        if (!hasAll) {
+          return false
+        }
       }
-      if (filters.onlyOnSale) {
-        if (!p.price?.isOnSale) return false;
+
+      if (filters.onlyOnSale && !p.price?.isOnSale) {
+        return false
       }
-      return true;
-    });
+
+      return true
+    })
 
     if (filters.sortBy === 'price-asc') {
-      res.sort((a,b) => (a.price?.discountPrice || a.price?.basePrice || 0) - (b.price?.discountPrice || b.price?.basePrice || 0));
-    } else if (filters.sortBy === 'price-desc') {
-      res.sort((a,b) => (b.price?.discountPrice || b.price?.basePrice || 0) - (a.price?.discountPrice || a.price?.basePrice || 0));
+      return [...base].sort(
+        (a, b) => (a.price?.discountPrice || a.price?.basePrice || 0) - (b.price?.discountPrice || b.price?.basePrice || 0)
+      )
     }
-    
-    return res;
-  }, [products, filters]);
+
+    if (filters.sortBy === 'price-desc') {
+      return [...base].sort(
+        (a, b) => (b.price?.discountPrice || b.price?.basePrice || 0) - (a.price?.discountPrice || a.price?.basePrice || 0)
+      )
+    }
+
+    return base
+  }, [products, filters])
 
   return (
     <div style={{ background: 'var(--color-cream)', minHeight: '60vh' }}>
-
-      {/* BARRA STICKY DE FILTROS */}
-      <div style={{
-        position: 'sticky',
-        top: 'var(--navbar-height)',
-        zIndex: 'var(--z-sticky)',
-        background: 'var(--color-cream)',
-        borderBottom: '1px solid rgba(44,24,16,0.1)',
-        height: '48px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 clamp(1rem, 4vw, 3rem)'
-      }}>
-        <p style={{
-          fontFamily: 'var(--font-dm-sans)',
-          fontSize: '0.65rem',
-          letterSpacing: '0.15em',
-          textTransform: 'uppercase',
-          color: 'var(--color-dark)',
-          opacity: 0.45
-        }}>
+      <div
+        style={{
+          position: 'sticky',
+          top: 'var(--navbar-height)',
+          zIndex: 'var(--z-sticky)',
+          background: 'var(--color-cream)',
+          borderBottom: '1px solid rgba(44,24,16,0.1)',
+          height: '48px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 clamp(1rem, 4vw, 3rem)'
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--font-dm-sans)',
+            fontSize: '0.65rem',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: 'var(--color-dark)',
+            opacity: 0.45
+          }}
+        >
           {filtered.length} {filtered.length === 1 ? 'fragancia' : 'fragancias'}
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          {/* DROPDOWN ORDENAR */}
           <select
             value={filters.sortBy}
-            onChange={e => setFilters(f => ({ 
-              ...f, 
-              sortBy: e.target.value as typeof filters.sortBy 
-            }))}
+            onChange={(e) => setFilters((f) => ({ ...f, sortBy: e.target.value as FiltersState['sortBy'] }))}
             style={{
               fontFamily: 'var(--font-dm-sans)',
               fontSize: '0.7rem',
@@ -131,10 +145,9 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
             <option value="recommended">Recomendados</option>
             <option value="price-asc">Precio: menor a mayor</option>
             <option value="price-desc">Precio: mayor a menor</option>
-            <option value="newest">Más recientes</option>
+            <option value="newest">{'M\u00e1s recientes'}</option>
           </select>
 
-          {/* BOTÓN FILTROS */}
           <button
             style={{
               fontFamily: 'var(--font-dm-sans)',
@@ -154,24 +167,25 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
           >
             Filtros
             {(filters.selectedBrands.length + filters.selectedTags.length) > 0 && (
-              <span style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                background: 'var(--color-gold)',
-                display: 'inline-block'
-              }} />
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: 'var(--color-gold)',
+                  display: 'inline-block'
+                }}
+              />
             )}
           </button>
         </div>
       </div>
 
-      {/* GRID DE PRODUCTOS */}
       {filtered.length === 0 ? (
         <EmptyState
           title="Sin resultados"
-          subtitle="Probá con otros filtros o explorá todo el catálogo."
-          action={{ label: "Ver todo", href: "/catalogo" }}
+          subtitle={'Prob\u00e1 con otros filtros o explor\u00e1 todo el cat\u00e1logo.'}
+          action={{ label: 'Ver todo', href: '/catalogo' }}
           theme="light"
         />
       ) : (
@@ -183,32 +197,21 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1px',
-            background: 'rgba(44,24,16,0.06)',
+            gap: '0',
+            background: 'transparent',
             padding: 'clamp(1rem, 4vw, 2rem)',
             paddingTop: '2rem'
           }}
         >
           {filtered.map((product, i) => (
             <motion.div key={product._id} variants={cardVariants}>
-              <ProductCard
-                product={product}
-                theme="light"
-                index={i}
-              />
+              <ProductCard product={product} theme="light" index={i} context="catalog" />
             </motion.div>
           ))}
         </motion.div>
       )}
 
-      {/* DRAWER DE FILTROS */}
-      <CatalogFilters
-        brands={brands}
-        filters={filters}
-        onFiltersChange={setFilters}
-        filteredCount={filtered.length}
-      />
-
+      <CatalogFilters brands={brands} filters={filters} onFiltersChange={setFilters} filteredCount={filtered.length} />
     </div>
   )
 }

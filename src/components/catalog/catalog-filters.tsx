@@ -67,7 +67,11 @@ export default function CatalogFilters({
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
             style={{
-              position: 'fixed', inset: 0,
+              position: 'fixed',
+              top: 'var(--navbar-height)',
+              left: 0,
+              right: 0,
+              bottom: 0,
               background: 'rgba(44,24,16,0.4)',
               zIndex: 'var(--z-drawer-overlay)'
             }}
@@ -80,7 +84,11 @@ export default function CatalogFilters({
             exit={{ x: '100%' }}
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
             style={{
-              position: 'fixed', top: 0, right: 0, bottom: 0,
+              position: 'fixed',
+              top: 'var(--navbar-height)',
+              right: 0,
+              bottom: 0,
+              height: 'calc(100vh - var(--navbar-height))',
               width: '320px',
               background: 'var(--color-cream)',
               zIndex: 'var(--z-drawer)',
