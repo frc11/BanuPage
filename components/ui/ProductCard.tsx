@@ -13,6 +13,8 @@ import RevealImage from '@/src/components/ui/reveal-image';
 import ProductBadge from '@/src/components/ui/product-badge';
 import ProductPrice from '@/src/components/ui/product-price';
 import RevealText from '@/src/components/ui/reveal-text';
+import { PerformanceBars } from '@/src/components/ui/performance-bars';
+import OccasionTags from '@/src/components/ui/occasion-tags';
 
 export interface ProductCardProps {
   product: PerfumeData;
@@ -23,31 +25,6 @@ export interface ProductCardProps {
   priority?: boolean;
 }
 
-function PerformanceDots({ longevity, projection }: { longevity: number; projection: number }) {
-  const renderDots = (value: number) => {
-    return Array.from({ length: 5 }).map((_, i) => (
-      <div
-        key={i}
-        className={`w-1.5 h-1.5 rounded-full ${
-          i < value ? 'bg-[var(--color-gold)]' : 'bg-[var(--color-cream-dark)] opacity-40'
-        }`}
-      />
-    ));
-  };
-
-  return (
-    <div className="flex flex-col gap-[0.375rem] mt-4 mb-2">
-      <div className="flex items-center justify-between font-sans text-[0.6rem] uppercase tracking-[0.15em] opacity-60">
-        <span>Longevidad</span>
-        <div className="flex gap-1">{renderDots(longevity)}</div>
-      </div>
-      <div className="flex items-center justify-between font-sans text-[0.6rem] uppercase tracking-[0.15em] opacity-60">
-        <span>Proyección</span>
-        <div className="flex gap-1">{renderDots(projection)}</div>
-      </div>
-    </div>
-  );
-}
 
 export function ProductCard({ 
   product, 
@@ -83,6 +60,9 @@ export function ProductCard({
       imageUrl: product.imageUrl ?? '',
     });
   };
+
+  const waMessage = `Hola Banū, quiero consultar sobre ${product.brand?.title ? `${product.brand.title} ` : ""}${product.name}`;
+  const waUrl = `https://wa.me/5493814665503?text=${encodeURIComponent(waMessage)}`;
 
   return (
     <div className="group flex flex-col bg-transparent border-none shadow-none w-[220px] md:w-[280px] shrink-0 overflow-hidden relative">
@@ -161,66 +141,98 @@ export function ProductCard({
           />
         </div>
 
-        {/* 6. Subcomponente Rendimiento (Visual Dots) */}
+        {/* 6. Rendimiento */}
         {showPerformance && (
-          <PerformanceDots 
-            longevity={product.performance.longevity} 
-            projection={product.performance.projection} 
-          />
+          <div className="mt-4">
+            <PerformanceBars 
+              longevity={product.performance.longevity} 
+              projection={product.performance.projection} 
+              theme={theme}
+            />
+          </div>
+        )}
+
+        {/* 6.5 Occasion Tags */}
+        {product.tags && product.tags.length > 0 && (
+          <div className="mt-2 scale-75 origin-left overflow-hidden">
+            <OccasionTags tags={product.tags} theme={theme} />
+          </div>
         )}
 
         {/* Filler para empujar el botón al fondo si la card crece */}
         <div className="flex-grow" />
 
-        {/* 7. CTA Selección */}
+        {/* 7. CTAs */}
         {showButton && (
-          <button
-            id={`add-selection-${product._id}`}
-            onClick={handleAdd}
-          aria-label={
-            isSelected
-              ? `Quitar ${product.name} de mi selección`
-              : `Agregar ${product.name} a mi selección`
-          }
-          className={`
-            mt-auto w-full flex items-center justify-center gap-2
-            border py-[0.75rem] px-4 bg-transparent
-            font-sans text-[0.65rem] tracking-[0.2em] uppercase
-            transition-all duration-300 ease focus:outline-none
-            ${isSelected
-              ? 'border-[var(--color-gold)] text-[var(--color-gold)]'
-              : `${borderColor} ${textColor} hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:!text-[var(--color-cream)]`
-            }
-          `}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {isSelected ? (
-              <motion.span
-                key="check"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-2"
-              >
-                <Check size={11} strokeWidth={2.5} />
-                EN MI SELECCIÓN
-              </motion.span>
-            ) : (
-              <motion.span
-                key="plus"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-2"
-              >
-                <Plus size={11} strokeWidth={2.5} />
-                SELECCIONAR
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
+          <div className="mt-auto flex flex-col gap-2">
+            {/* Botón Selección */}
+            <button
+              id={`add-selection-${product._id}`}
+              onClick={handleAdd}
+              aria-label={
+                isSelected
+                  ? `Quitar ${product.name} de mi selección`
+                  : `Agregar ${product.name} a mi selección`
+              }
+              className={`
+                w-full flex items-center justify-center gap-2
+                border py-[0.75rem] px-4 bg-transparent
+                font-sans text-[0.65rem] tracking-[0.2em] uppercase
+                transition-all duration-300 ease focus:outline-none
+                ${isSelected
+                  ? 'border-[var(--color-gold)] text-[var(--color-gold)]'
+                  : `${borderColor} ${textColor} hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:!text-[var(--color-cream)]`
+                }
+              `}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isSelected ? (
+                  <motion.span
+                    key="check"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check size={11} strokeWidth={2.5} />
+                    EN MI SELECCIÓN
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="plus"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus size={11} strokeWidth={2.5} />
+                    SELECCIONAR
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+
+            {/* Botón WhatsApp Consulta Directa */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`
+                w-full flex items-center justify-center gap-2
+                border py-[0.75rem] px-4 bg-transparent
+                font-sans text-[0.65rem] tracking-[0.2em] uppercase
+                transition-all duration-300 ease
+                ${borderColor} ${textColor} hover:bg-[var(--color-dark)] hover:text-[var(--color-text-light)]
+              `}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+              </svg>
+              CONSULTAR
+            </a>
+          </div>
         )}
       </div>
     </div>

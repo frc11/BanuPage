@@ -219,3 +219,35 @@ body::after {
 .btn-dark:focus-visible {
   outline-color: #EAE6DF;
 }
+
+
+/* BANŪ Brand Identity — Skeletons & Shimmer */
+@keyframes banu-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.banu-skeleton {
+  background: linear-gradient(
+    90deg,
+    #D4CFC7 0%,        /* --color-cream-dark */
+    #EAE6DF 50%,       /* --color-cream (shimmer peak) */
+    #D4CFC7 100%
+  );
+  background-size: 200% 100%;
+  animation: banu-shimmer 1.8s ease-in-out infinite;
+}
+
+.nav-link {
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: letter-spacing 0.4s ease, opacity 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  letter-spacing: 0.3em;
+  opacity: 1;
+}

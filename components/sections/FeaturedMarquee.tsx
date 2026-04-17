@@ -33,17 +33,16 @@ export async function FeaturedMarquee() {
           className="font-serif text-[clamp(2rem,6vw,3.5rem)] font-light text-[var(--color-text-light)]"
         />
       </div>
-      <Marquee speed="normal" direction="left" className="items-start hide-scrollbar">
+      <Marquee speed="normal" direction="left" align="start" className="hide-scrollbar">
         {perfumes.map((product, index) => (
-          <div key={product._id} className="px-3 md:px-4 shrink-0 flex">
-            <ProductCard 
-              product={product} 
-              index={index} 
-              showPerformance={false} 
-              showButton={false} 
-              priority={index < 3}
-            />
-          </div>
+          <ProductCard 
+            key={product._id}
+            product={product} 
+            index={index} 
+            showPerformance={false} 
+            showButton={false} 
+            priority={index < 3}
+          />
         ))}
       </Marquee>
     </section>

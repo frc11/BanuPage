@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern';
+import RevealText from '@/src/components/ui/reveal-text';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -22,69 +23,13 @@ const copyVariants = {
   visible: (delay: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.9, ease: [0.25, 0.1, 0.25, 1] as const, delay },
+    transition: { 
+      duration: 0.9, 
+      ease: [0.25, 0.1, 0.25, 1] as const, // Forzado de tupla para TS
+      delay 
+    },
   }),
 };
-
-const videoVariants = {
-  enter: { opacity: 0 },
-  center: { opacity: 1, transition: { duration: 1.5, ease: 'easeInOut' } },
-  exit: { opacity: 0, transition: { duration: 1.2, ease: 'easeInOut' } },
-};
-
-// ─── Sub-component: HeroVideoBackground ──────────────────────────────────────
-
-interface HeroVideoBackgroundProps {
-  videoUrls: string[];
-}
-
-function HeroVideoBackground({ videoUrls }: HeroVideoBackgroundProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Preload the next video URL
-  useEffect(() => {
-    if (videoUrls.length < 2) return;
-    const nextUrl = videoUrls[(currentIndex + 1) % videoUrls.length];
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'video';
-    link.href = nextUrl;
-    document.head.appendChild(link);
-    return () => { document.head.removeChild(link); };
-  }, [currentIndex, videoUrls]);
-
-  return (
-    <div className="absolute inset-0 bg-[var(--color-dark)] -z-10">
-      {videoUrls && videoUrls.length > 0 ? (
-        <AnimatePresence mode="wait">
-          <motion.video
-            key={videoUrls[currentIndex]} // CRÍTICO para que React cambie el source
-            src={videoUrls[currentIndex]}
-            autoPlay
-            loop={videoUrls.length === 1} // Solo loopear si hay 1 solo video
-            muted // CRÍTICO para Autoplay en todos los navegadores
-            playsInline // CRÍTICO para iOS
-            onEnded={() => {
-              if (videoUrls.length > 1) {
-                setCurrentIndex((prev) => (prev + 1) % videoUrls.length);
-              }
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
-            className="absolute inset-0 w-full h-full object-cover z-0"
-          />
-        </AnimatePresence>
-      ) : (
-        // Fallback actual (fondo oscuro con patrón)
-        <div className="absolute inset-0 bg-[var(--color-dark)] flex items-center justify-center z-0">
-           <ArabicPatternOverlay opacity={0.07} color="light" />
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Main Hero Component ──────────────────────────────────────────────────────
 
@@ -96,30 +41,52 @@ export function Hero({
   ctaLink = "#explore",
 }: HeroProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // Limpieza defensiva de URLs
+  const activeVideos = videoUrls?.filter(url => !!url) || [];
+
+  useEffect(() => {
+    // Forzamos el play y el mute directamente en el nodo del DOM 
+    // cada vez que cambia el índice o se cargan las URLs.
+    // Esto garantiza el bypass de las restricciones de autoplay de los navegadores.
+    const currentVideo = videoRefs.current[currentIndex];
+    if (currentVideo) {
+      currentVideo.muted = true; 
+      currentVideo.play().catch((error) => {
+        console.warn(
+          "Autoplay bloqueado por el navegador, esperando interacción:",
+          error
+        );
+      });
+    }
+  }, [currentIndex, activeVideos]);
 
   return (
     <section className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[var(--color-dark)]">
       
-      {/* CAPA 1: FONDO / FALLBACK */}
+      {/* CAPA 1: FONDO / FALLBACK (z-0) */}
       <ArabicPatternOverlay opacity={0.07} color="light" className="z-0" />
 
-      {/* CAPA 2: VIDEOS (CROSS-FADE) */}
-      {videoUrls && videoUrls.length > 0 && (
+      {/* CAPA 2: VIDEOS (CROSS-FADE) (z-0) */}
+      {activeVideos.length > 0 && (
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-          {videoUrls.map((url, index) => (
+          {activeVideos.map((url, index) => (
             <video
               key={url}
+              ref={(el) => {
+                videoRefs.current[index] = el;
+              }}
               src={url}
-              autoPlay
               muted
               playsInline
-              loop={videoUrls.length === 1}
+              loop={activeVideos.length === 1}
               onEnded={() => {
-                if (videoUrls.length > 1 && index === currentIndex) {
-                  setCurrentIndex((prev) => (prev + 1) % videoUrls.length);
+                if (activeVideos.length > 1 && index === currentIndex) {
+                  setCurrentIndex((prev) => (prev + 1) % activeVideos.length);
                 }
               }}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out scale-[1.1] ${
                 index === currentIndex ? "opacity-100" : "opacity-0"
               }`}
             />
@@ -127,7 +94,7 @@ export function Hero({
         </div>
       )}
 
-      {/* CAPA 3: CINEMATIC OVERLAY */}
+      {/* CAPA 3: CINEMATIC OVERLAYS (z-10) */}
       <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
       <div
         className="absolute inset-0 pointer-events-none z-10"
@@ -137,28 +104,22 @@ export function Hero({
         }}
       />
 
-      {/* CAPA 4: CONTENT */}
+      {/* CAPA 4: CONTENT (z-20) */}
       <div className="relative z-20 flex flex-col items-center w-full max-w-4xl px-6 text-center">
-        <motion.h1
-          custom={0.3}
-          variants={copyVariants}
-          initial="hidden"
-          animate="visible"
+        <RevealText
+          as="h1"
+          text={title}
           className="font-serif text-[var(--color-cream)] font-light text-[clamp(3.5rem,10vw,8rem)] tracking-[0.1em] leading-[0.9] mb-8"
-        >
-          {title}
-        </motion.h1>
+          delay={0.3}
+        />
 
         {subtitle && (
-          <motion.p
-            custom={0.65}
-            variants={copyVariants}
-            initial="hidden"
-            animate="visible"
+          <RevealText
+            as="p"
+            text={subtitle}
             className="font-sans text-[var(--color-cream)] text-[clamp(0.75rem,1.5vw,0.9rem)] tracking-[0.35em] uppercase opacity-70 mb-12 max-w-[80%] mx-auto"
-          >
-            {subtitle}
-          </motion.p>
+            delay={0.65}
+          />
         )}
 
         <motion.div
@@ -180,7 +141,7 @@ export function Hero({
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator (z-20) */}
       <motion.div
         className="absolute bottom-10 flex flex-col items-center gap-4 z-20"
         initial={{ opacity: 0 }}

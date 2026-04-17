@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { ReviewGrid, ReviewItem } from '@/components/ui/ReviewGrid';
-import { Typography } from '@/components/ui/Typography';
 import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { fadeUp } from '@/lib/animation-variants';
+import RevealText from '@/src/components/ui/reveal-text';
 
 const FALLBACK_REVIEWS: ReviewItem[] = [
   {
@@ -49,9 +49,12 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
           variants={fadeUp}
           className="w-full flex flex-col items-center mb-16 md:mb-24 text-center"
         >
-          <Typography variant="heading" className="text-[var(--color-dark)] !mb-4 w-full">
-            Voces de la Bóveda
-          </Typography>
+          <RevealText
+            as="h2"
+            text="Voces de la Bóveda"
+            className="text-[var(--color-dark)] font-serif text-[3.5rem] !mb-4 w-full text-center"
+            delay={0.2}
+          />
           <span className="font-sans text-[0.65rem] tracking-[0.4em] uppercase text-[var(--color-gold)] font-medium text-center">
             EXPERIENCIAS CONFIDENCIALES
           </span>

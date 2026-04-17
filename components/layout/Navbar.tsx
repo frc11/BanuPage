@@ -34,7 +34,7 @@ export function Navbar() {
           href="https://wa.me/5493814665503"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-[var(--color-text-light)] opacity-80 hover:opacity-100 transition-opacity duration-200 flex items-center"
+          className="nav-link opacity-80 hover:opacity-100 transition-opacity duration-200"
         >
           <span className="text-[var(--color-gold)] mr-1">+</span> CONTACTANOS POR WHATSAPP
         </a>
@@ -110,9 +110,9 @@ export function Navbar() {
 
           <button
             onClick={() => setIsNavDrawerOpen(true)}
-            className="opacity-80 hover:opacity-100 transition-opacity duration-200 flex items-center gap-2"
+            className="nav-link opacity-80 hover:opacity-100 transition-opacity duration-200 flex items-center gap-2"
           >
-            <span className="font-sans text-[0.65rem] tracking-[0.2em] uppercase hidden md:inline-block">MENÚ</span>
+            <span className="hidden md:inline-block">MENÚ</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="3" y1="6" x2="21" y2="6" />
               <line x1="4.5" y1="12" x2="21" y2="12" />

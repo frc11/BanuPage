@@ -32,7 +32,7 @@ export function Footer() {
             <ul className="flex flex-col gap-3">
               {['Contacto', 'FAQ', 'Devoluciones'].map(item => (
                 <li key={item}>
-                  <Link href="#" className="font-sans text-[0.8rem] text-[var(--color-text-light)] opacity-70 hover:opacity-100 hover:underline transition-all duration-200">
+                  <Link href="#" className="nav-link text-[0.8rem] text-[var(--color-text-light)] opacity-70">
                     {item}
                   </Link>
                 </li>
@@ -46,7 +46,7 @@ export function Footer() {
             <ul className="flex flex-col gap-3">
               {['Sobre Nosotros', 'Términos', 'Privacidad'].map(item => (
                 <li key={item}>
-                  <Link href="#" className="font-sans text-[0.8rem] text-[var(--color-text-light)] opacity-70 hover:opacity-100 hover:underline transition-all duration-200">
+                  <Link href="#" className="nav-link text-[0.8rem] text-[var(--color-text-light)] opacity-70">
                     {item}
                   </Link>
                 </li>
@@ -65,7 +65,7 @@ export function Footer() {
               />
               <button 
                 type="submit" 
-                className="mt-4 font-sans text-[0.8rem] uppercase text-[var(--color-text-light)] opacity-70 hover:opacity-100 hover:underline transition-all"
+                className="nav-link mt-4 text-[0.8rem] text-[var(--color-text-light)] opacity-70"
               >
                 + SUSCRIBIRSE
               </button>

@@ -5,10 +5,10 @@ import { TrustItemData, FaqItemData } from '@/types/sanity';
 import { TrustGrid } from '@/components/ui/TrustGrid';
 import { FaqAccordion } from '@/components/ui/FaqAccordion';
 import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern';
-import { Typography } from '@/components/ui/Typography';
 import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { fadeUp } from '@/lib/animation-variants';
+import RevealText from '@/src/components/ui/reveal-text';
 
 const FALLBACK_TRUST: TrustItemData[] = [
   { _id: '1', title: 'Envíos Nacionales', description: 'Logística discreta y asegurada a todo el territorio con tracking prioritario.', iconName: 'Truck' },
@@ -57,9 +57,12 @@ export function TrustAndFaq({ trustItems, faqItems }: TrustAndFaqProps) {
           viewport={{ once: true }}
           className="w-full max-w-[800px] flex flex-col items-center px-6 lg:px-8"
         >
-          <Typography variant="heading" className="text-[var(--color-text-light)] !mb-16 text-center">
-            Preguntas Frecuentes
-          </Typography>
+          <RevealText
+            as="h2"
+            text="Preguntas Frecuentes"
+            className="text-[var(--color-text-light)] font-serif text-[3.5rem] !mb-16 text-center"
+            delay={0.2}
+          />
           <FaqAccordion faqs={faq} />
         </motion.div>
       </div>

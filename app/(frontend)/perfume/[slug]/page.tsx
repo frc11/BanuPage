@@ -10,10 +10,11 @@ import {
   PRODUCT_BY_SLUG_QUERY,
   ALL_PRODUCT_SLUGS_QUERY,
 } from "@/lib/queries";
-import type { PerfumeData } from "@/types/sanity";
+import { mapSanityPerfume } from "@/lib/mappers";
 import { ProductInfo } from "@/src/components/pdp/product-info";
 import { ArabicPatternOverlay } from "@/components/ui/ArabicPattern";
 import { BanuLogo } from "@/components/ui/BanuLogo";
+import RevealImage from "@/src/components/ui/reveal-image";
 
 // ─── Static Params (ISR + prerender en build) ─────────────────────────────────
 
@@ -30,20 +31,19 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await sanityFetch<PerfumeData | null>({
+  const rawProduct = await sanityFetch<any>({
     query: PRODUCT_BY_SLUG_QUERY,
     params: { slug },
   });
 
-  if (!product) {
+  if (!rawProduct) {
     return { title: "Perfume no encontrado | Banū Scents" };
   }
 
+  const product = mapSanityPerfume(rawProduct);
   const brandPrefix = product.brand?.title ? `${product.brand.title} · ` : "";
-  const priceStr =
-    typeof product.price.basePrice === "number" && product.price.basePrice > 0
-      ? ` — USD ${product.price.isOnSale && product.price.discountPrice ? product.price.discountPrice : product.price.basePrice}`
-      : "";
+  const activePrice = product.price.isOnSale && product.price.discountPrice ? product.price.discountPrice : product.price.basePrice;
+  const priceStr = activePrice > 0 ? ` — USD ${activePrice}` : "";
 
   return {
     title: `${product.name} | ${brandPrefix}Banū Scents`,
@@ -64,13 +64,16 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const product = await sanityFetch<PerfumeData | null>({
+  const rawProduct = await sanityFetch<any>({
     query: PRODUCT_BY_SLUG_QUERY,
     params: { slug },
   });
 
   // Hard 404 — no existe el producto o fue eliminado
-  if (!product) notFound();
+  if (!rawProduct) notFound();
+
+  // Normalización via Mapper (Arquitectura Defensiva)
+  const product = mapSanityPerfume(rawProduct);
 
   return (
     <main className="min-h-screen bg-[var(--color-cream)] pt-[86px]">
@@ -94,7 +97,7 @@ export default async function ProductPage({
             <ArabicPatternOverlay opacity={0.05} color="dark" />
 
             {product.imageUrl ? (
-              <Image
+              <RevealImage
                 src={product.imageUrl}
                 alt={product.name}
                 fill

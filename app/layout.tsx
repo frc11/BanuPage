@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   description: "Lujo Silencioso. Fragancias nicho y árabes de las casas más prestigiosas del mundo.",
 };
 
+import { CustomCursor } from "@/src/components/ui/custom-cursor";
+import { ScrollProgress } from "@/src/components/ui/scroll-progress";
+import { WhatsAppButton } from "@/src/components/ui/whatsapp-button";
+import { MiniSelectionDrawer } from "@/src/components/selection/mini-selection-drawer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,8 +36,14 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${cormorant.variable} ${dmSans.variable} scroll-smooth`}>
       <body className="antialiased flex flex-col min-h-screen text-[var(--color-text)] bg-[var(--color-cream)] selection:bg-[var(--color-gold)] selection:text-[var(--color-text-light)]">
-        {children}
         <LoadingScreen />
+        <CustomCursor />
+        <ScrollProgress />
+        
+        {children}
+        
+        <WhatsAppButton />
+        <MiniSelectionDrawer />
       </body>
     </html>
   );

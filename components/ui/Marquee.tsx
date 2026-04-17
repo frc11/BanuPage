@@ -8,17 +8,18 @@ export interface MarqueeProps {
   /** Flujo de movimiento */
   direction?: 'left' | 'right';
   className?: string;
+  align?: 'start' | 'center' | 'end';
 }
 
 export function Marquee({
   children,
   speed = 'slow',
   direction = 'left',
-  className
+  className,
+  align = 'center'
 }: MarqueeProps) {
   
   // Relaciones de tiempo para la estética "Silent Luxury"
-  // Slow (60s) garantiza que los logos pasen como una vitrina lenta.
   const speedMap: Record<string, string> = {
     slow: '60s',
     normal: '35s',
@@ -27,6 +28,11 @@ export function Marquee({
 
   const durationValue = typeof speed === 'number' ? `${speed}s` : speedMap[speed] || '60s';
   const directionClass = direction === 'left' ? 'animate-marquee' : 'animate-marquee-reverse';
+  const alignClass = {
+    start: 'items-start',
+    center: 'items-center',
+    end: 'items-end'
+  }[align];
 
   return (
     <div 
@@ -43,7 +49,8 @@ export function Marquee({
       */}
       <div 
         className={cn(
-          "w-max flex flex-row shrink-0 items-center justify-around gap-16 px-8",
+          "w-max flex flex-row shrink-0 justify-around gap-16 px-8",
+          alignClass,
           directionClass,
           "group-hover:[animation-play-state:paused]"
         )}
@@ -58,7 +65,8 @@ export function Marquee({
       */}
       <div 
         className={cn(
-          "w-max flex flex-row shrink-0 items-center justify-around gap-16 px-8",
+          "w-max flex flex-row shrink-0 justify-around gap-16 px-8",
+          alignClass,
           directionClass,
           "group-hover:[animation-play-state:paused]"
         )}

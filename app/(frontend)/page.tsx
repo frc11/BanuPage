@@ -21,7 +21,7 @@ import { BrandsMarquee } from '@/components/sections/BrandsMarquee';
 import { FeaturedMarquee } from '@/components/sections/FeaturedMarquee';
 import { TrustAndFaq } from '@/components/sections/TrustAndFaq';
 import { ReviewsSection } from '@/components/sections/ReviewsSection';
-import { SectionDivider } from '@/components/ui/SectionDivider';
+import { SectionDivider } from '@/src/components/ui/section-divider';
 
 export default async function Home() {
   // Execución paralela de todas las consultas GROQ para minimizar latencia SSR
@@ -44,17 +44,23 @@ export default async function Home() {
         videoUrls={heroData?.videoUrls ?? []}
       />
       
-      <SectionDivider variant="ornament" />
+      <SectionDivider variant="pattern" from="dark" to="cream" />
       
       <BrandsMarquee />
+      
+      <SectionDivider variant="pattern" from="cream" to="dark" />
+      
       <FeaturedMarquee />
       
-      <SectionDivider variant="ornament" />
+      <SectionDivider variant="line" from="dark" to="dark" />
       
       <TrustAndFaq trustItems={trustData} faqItems={faqData} />
+      
+      <SectionDivider variant="pattern" from="dark" to="cream" />
+      
       <ReviewsSection reviews={reviewsData} />
       
-      <SectionDivider variant="ornament" />
+      <SectionDivider variant="pattern" from="cream" to="dark" />
     </main>
   );
 }

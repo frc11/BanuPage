@@ -100,7 +100,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                     <Link
                       href={item.href}
                       onClick={onClose}
-                      className="inline-flex items-center gap-3 hover:opacity-60 transition-opacity duration-300"
+                      className="nav-link items-center gap-3"
                     >
                       <span className="font-serif text-[clamp(2rem,5vw,2.8rem)] font-normal text-[var(--color-dark)] leading-[1.4]">
                         {item.label}
@@ -128,9 +128,9 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                     <Link
                       href="#"
                       onClick={onClose}
-                      className="inline-block hover:opacity-60 transition-opacity duration-300"
+                      className="nav-link"
                     >
-                      <span className="font-sans text-[0.8rem] tracking-[0.1em] text-[var(--color-dark)] opacity-60 underline underline-offset-4 decoration-1">
+                      <span className="font-sans text-[0.8rem] text-[var(--color-dark)] opacity-60 underline underline-offset-4 decoration-1">
                         {item}
                       </span>
                     </Link>

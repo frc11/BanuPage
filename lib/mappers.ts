@@ -20,6 +20,17 @@ export function mapSanityPerfume(raw: any): PerfumeData {
   }
 
   try {
+    // Normalización de notas (de array en CMS a string en UI)
+    const normalizeNotes = (notes: string[] | undefined) => 
+      Array.isArray(notes) ? notes.join(', ') : (typeof notes === 'string' ? notes : '');
+
+    // Unificación de tags (mantenemos legacy tags + vibe + clima para máxima compatibilidad)
+    const unifiedTags = [
+      ...(Array.isArray(raw.tags) ? raw.tags : []),
+      ...(Array.isArray(raw.vibe) ? raw.vibe : []),
+      ...(Array.isArray(raw.clima) ? raw.clima : [])
+    ].filter((v, i, a) => v && a.indexOf(v) === i); // Remover duplicados y falsy
+
     return {
       _id: raw._id || '',
       name: raw.name || 'Perfume',
@@ -34,21 +45,21 @@ export function mapSanityPerfume(raw: any): PerfumeData {
         isOnSale: !!raw.price?.isOnSale,
       },
 
-      // Dominio Olfativo
+      // Dominio Olfativo (Mapeo de nuevos campos)
       notes: {
-        top: raw.notes?.top || '',
-        heart: raw.notes?.heart || '',
-        base: raw.notes?.base || '',
+        top: normalizeNotes(raw.topNotes || raw.notes?.top),
+        heart: normalizeNotes(raw.heartNotes || raw.notes?.heart),
+        base: normalizeNotes(raw.baseNotes || raw.notes?.base),
       },
 
-      // Dominio Rendimiento
+      // Dominio Rendimiento (Mapeo de nuevos campos directos)
       performance: {
-        longevity: raw.performance?.longevity && typeof raw.performance.longevity === 'number' && raw.performance.longevity >= 1 && raw.performance.longevity <= 5 ? raw.performance.longevity : 3,
-        projection: raw.performance?.projection && typeof raw.performance.projection === 'number' && raw.performance.projection >= 1 && raw.performance.projection <= 5 ? raw.performance.projection : 3,
+        longevity: raw.longevity || raw.performance?.longevity || 3,
+        projection: raw.projection || raw.performance?.projection || 3,
       },
 
-      // Extracción segura de array
-      tags: Array.isArray(raw.tags) ? raw.tags : [],
+      // Extracción segura de array unificado
+      tags: unifiedTags,
 
       isFeatured: !!raw.isFeatured,
       imageUrl: raw.imageUrl || undefined,

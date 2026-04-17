@@ -11,6 +11,8 @@ import { PerfumeData } from "@/types/sanity";
 import ProductBadge from "@/src/components/ui/product-badge";
 import ProductPrice from "@/src/components/ui/product-price";
 import OccasionTags from "@/src/components/ui/occasion-tags";
+import { PerformanceBars } from "@/src/components/ui/performance-bars";
+import { Truck, Shield, MessageCircle, ChevronDown } from "lucide-react";
 
 // ─── WhatsApp Icon ────────────────────────────────────────────────────────────
 
@@ -104,87 +106,80 @@ export function ProductInfo({ product }: ProductInfoProps) {
         />
       </div>
 
-      {/* Tags de Ocasión */}
+      {/* 7. Links de Servicio */}
+      <div className="mt-8 flex flex-col gap-4 border-t border-[var(--color-dark)]/10 pt-8">
+        <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
+          <Truck size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
+          <span>Envío prioritario a todo el país</span>
+        </div>
+        <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
+          <Shield size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
+          <span>Garantía de autenticidad BANŪ</span>
+        </div>
+        <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
+          <MessageCircle size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
+          <span>Asesoramiento olfativo personalizado</span>
+        </div>
+      </div>
+
+      {/* 8. Descripción (Notas Olfativas como fallback) */}
+      <div className="mt-10">
+        <p className="font-sans text-[0.6rem] tracking-[0.2em] uppercase opacity-40 mb-4">Notas Olfativas</p>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="flex flex-col gap-1">
+            <span className="font-sans text-[0.65rem] tracking-[0.1em] uppercase opacity-60">Salida</span>
+            <p className="font-serif text-[1rem] italic opacity-90">{product.notes.top}</p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="font-sans text-[0.65rem] tracking-[0.1em] uppercase opacity-60">Corazón</span>
+            <p className="font-serif text-[1rem] italic opacity-90">{product.notes.heart}</p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="font-sans text-[0.65rem] tracking-[0.1em] uppercase opacity-60">Fondo</span>
+            <p className="font-serif text-[1rem] italic opacity-90">{product.notes.base}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 9. PerformanceBars */}
+      <div className="mt-10 pt-8 border-t border-[var(--color-dark)]/10">
+        <PerformanceBars 
+          longevity={product.performance.longevity} 
+          projection={product.performance.projection} 
+          theme="light"
+        />
+      </div>
+
+      {/* 10. OccasionTags */}
       {product.tags && product.tags.length > 0 && (
-        <OccasionTags tags={product.tags} theme="light" />
+        <div className="mt-4">
+          <OccasionTags tags={product.tags} theme="light" />
+        </div>
       )}
 
-      {/* ── CTAs ─────────────────────────────────────────────────────────── */}
-
-      {/* PRIMARIO — Agregar / Quitar de la selección */}
-      <button
-        id={`pdp-selection-btn-${product._id}`}
-        onClick={handleSelectionToggle}
-        aria-label={
-          isInSelection
-            ? `Quitar ${product.name} de mi selección`
-            : `Agregar ${product.name} a mi selección`
-        }
-        className={`
-          w-full flex items-center justify-center gap-3
-          px-8 py-4
-          font-sans text-[0.75rem] tracking-[0.2em] uppercase
-          transition-colors duration-300 ease-out
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)] focus-visible:ring-offset-2
-          overflow-hidden relative
-          ${
-            isInSelection
-              ? "bg-[var(--color-gold)] text-[var(--color-text-light)]"
-              : "bg-[var(--color-dark)] text-[var(--color-text-light)] hover:bg-[var(--color-gold)]"
-          }
-        `}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          {isInSelection ? (
-            <motion.span
-              key="added"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex items-center gap-3"
-            >
-              <Check size={16} strokeWidth={2} />
-              EN TU SELECCIÓN
-            </motion.span>
-          ) : (
-            <motion.span
-              key="add"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex items-center gap-3"
-            >
-              <Plus size={16} strokeWidth={2} />
-              AGREGAR A MI SELECCIÓN
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </button>
-
-      {/* SECUNDARIO — Consulta directa solo de este perfume */}
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Consultar por WhatsApp sobre ${product.name}`}
-        className="
-          mt-3 w-full flex items-center justify-center gap-3
-          border border-[var(--color-dark)] px-8 py-4 bg-transparent
-          font-sans text-[0.75rem] tracking-[0.2em] uppercase
-          text-[var(--color-dark)]
-          transition-all duration-300 ease-out
-          hover:bg-[var(--color-dark)] hover:text-[var(--color-text-light)]
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dark)] focus-visible:ring-offset-2
-        "
-      >
-        <WhatsAppIcon />
-        CONSULTAR ESTE PERFUME
-      </a>
+      {/* 11. Acordeones (Detalles, Envío) */}
+      <div className="mt-10 flex flex-col">
+        {[
+          { id: 'details', title: 'Detalles del Producto', content: `Este perfume ha sido seleccionado por la curaduría de la bóveda BANŪ. Inspirado en ${product.inspiredBy || 'las fragancias más exclusivas'}, ofrece una experiencia sensorial única.` },
+          { id: 'shipping', title: 'Política de Envío', content: 'Realizamos envíos a todo el territorio nacional mediante logística privada. El tiempo estimado de entrega es de 3 a 5 días hábiles.' }
+        ].map((acc) => (
+          <div key={acc.id} className="border-t border-[var(--color-dark)]/10">
+            <details className="group">
+              <summary className="flex items-center justify-between py-5 cursor-pointer list-none focus:outline-none">
+                <span className="font-sans text-[0.7rem] tracking-[0.2em] uppercase opacity-80">{acc.title}</span>
+                <ChevronDown size={14} className="opacity-40 transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="pb-5 font-sans text-[0.8rem] leading-relaxed opacity-60 max-w-[90%]">
+                {acc.content}
+              </div>
+            </details>
+          </div>
+        ))}
+        <div className="border-t border-[var(--color-dark)]/10 w-full" />
+      </div>
 
       {/* Hint contextual */}
-      <p className="mt-5 font-sans text-[0.6rem] tracking-[0.12em] text-[var(--color-dark)] opacity-35 text-center leading-relaxed">
+      <p className="mt-10 font-sans text-[0.6rem] tracking-[0.12em] text-[var(--color-dark)] opacity-35 text-center leading-relaxed">
         {isInSelection
           ? "Click para quitar · Consultá tu selección completa desde el ícono de la bolsa"
           : "Agregá varios perfumes y consultá todo de una vez por WhatsApp"}

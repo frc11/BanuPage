@@ -10,87 +10,8 @@ import { SelectionSummary } from "@/src/components/selection/selection-summary";
 import { SuggestedProducts } from "@/src/components/selection/suggested-products";
 import RevealText from "@/src/components/ui/reveal-text";
 import type { PerfumeData } from "@/types/sanity";
+import { EmptyState } from "@/src/components/ui/empty-state";
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
-
-function EmptyState() {
-  return (
-    <div
-      className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center"
-      role="status"
-      aria-label="Selección vacía"
-    >
-      {/* Logo decorativo */}
-      <div style={{ width: 60, height: 60, opacity: 0.15, marginBottom: "2rem" }}>
-        <Image
-          src="/logoSVG.svg"
-          alt="Banū Scents"
-          width={60}
-          height={60}
-          style={{ objectFit: "contain" }}
-        />
-      </div>
-
-      {/* Título */}
-      <p
-        style={{
-          fontFamily: "var(--font-dm-sans), sans-serif",
-          fontSize: "0.65rem",
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "var(--color-dark)",
-          opacity: 0.4,
-          marginBottom: "1.25rem",
-        }}
-      >
-        TU SELECCIÓN ESTÁ VACÍA
-      </p>
-
-      {/* Descripción */}
-      <p
-        style={{
-          fontFamily: "var(--font-dm-sans), sans-serif",
-          fontSize: "0.875rem",
-          color: "var(--color-dark)",
-          opacity: 0.5,
-          maxWidth: "300px",
-          lineHeight: 1.6,
-          marginBottom: "2.5rem",
-        }}
-      >
-        Explorá nuestro catálogo y agregá los perfumes que te interesen.
-      </p>
-
-      {/* CTA */}
-      <Link
-        href="/"
-        style={{
-          display: "inline-block",
-          border: "1px solid var(--color-dark)",
-          backgroundColor: "transparent",
-          color: "var(--color-dark)",
-          fontFamily: "var(--font-dm-sans), sans-serif",
-          fontSize: "0.7rem",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          padding: "0.875rem 2.5rem",
-          textDecoration: "none",
-          transition: "background-color 0.25s ease, color 0.25s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = "var(--color-dark)";
-          e.currentTarget.style.color = "var(--color-text-light)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "transparent";
-          e.currentTarget.style.color = "var(--color-dark)";
-        }}
-      >
-        IR AL CATÁLOGO
-      </Link>
-    </div>
-  );
-}
 
 // ─── Filled State — layout 2 columnas ────────────────────────────────────────
 
@@ -178,7 +99,13 @@ export function SelectionPageContent({ allFeatured }: SelectionPageContentProps)
       {/* Guard: esperar hidratación del store para evitar mismatch con localStorage */}
       {mounted ? (
         <>
-          {count === 0 ? <EmptyState /> : <FilledState count={count} />}
+          {count === 0 ? (
+            <EmptyState 
+              title="Tu selección está vacía" 
+              subtitle="Explorá nuestro catálogo y seleccioná los perfumes que despierten tu curiosidad."
+              action={{ label: "Ir al Catálogo", href: "/" }}
+            />
+          ) : <FilledState count={count} />}
           {/* Sugerencias: visibles en ambos estados — descubrimiento y upsell */}
           <SuggestedProducts allFeatured={allFeatured} />
         </>
