@@ -86,7 +86,7 @@ export function ProductCard({
 
   return (
     <div
-      className={`group relative flex flex-col gap-1 bg-transparent shadow-none overflow-hidden p-[var(--spacing-card)] !rounded-[4px] ${isCatalogCard
+      className={`product-card group relative flex flex-col gap-1 bg-transparent shadow-none overflow-hidden p-[var(--spacing-card)] !rounded-[4px] ${isCatalogCard
           ? 'w-full min-w-0'
           : fluidWidth
             ? 'w-full min-w-0 max-w-[320px]'
@@ -200,17 +200,7 @@ export function ProductCard({
             )}
 
             {/* Hover CTA — desliza desde abajo al hacer hover en la imagen */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 5,
-                transform: hovered ? 'translateY(0)' : 'translateY(100%)',
-                transition: 'transform 380ms cubic-bezier(0.25, 0.1, 0.25, 1)',
-              }}
-            >
+            <div className="product-card-cta absolute bottom-0 left-0 right-0 z-[5]">
               <button
                 onClick={handleAdd}
                 aria-label={isInSelection ? `Quitar ${product.name}` : `Agregar ${product.name} a mi selección`}

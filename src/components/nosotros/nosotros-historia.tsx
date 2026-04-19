@@ -25,6 +25,7 @@ export default function NosotrosHistoria() {
         {/* COLUMNA TEXTO */}
         <div>
           <motion.p
+            className="nosotros-historia-eyebrow"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.5 }}
             viewport={{ once: true }}
@@ -44,6 +45,7 @@ export default function NosotrosHistoria() {
           <RevealText
             text="Nacimos de una pasión por el perfume oriental"
             as="h2"
+            className="nosotros-historia-title"
             style={{
               fontFamily: 'var(--font-cormorant)',
               fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
@@ -51,7 +53,6 @@ export default function NosotrosHistoria() {
               color: 'var(--color-cream)',
               marginBottom: '2rem',
               lineHeight: 1.25,
-              textAlign: 'center',
             }}
           />
 
@@ -62,6 +63,7 @@ export default function NosotrosHistoria() {
           ].map((text, i) => (
             <motion.p
               key={i}
+              className="nosotros-historia-body"
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

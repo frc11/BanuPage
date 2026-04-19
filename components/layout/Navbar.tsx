@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Search, ShoppingBag } from 'lucide-react';
 import { BanuLogo } from '@/components/ui/BanuLogo';
@@ -10,8 +10,10 @@ import { useHydrated } from '@/src/hooks/use-hydrated';
 import { cn } from '@/lib/utils';
 import SearchModal from '@/src/components/ui/search-modal';
 import { usePathname } from 'next/navigation';
+import { useUiOverlayStore } from '@/src/store/ui-overlay-store';
 
 export function Navbar() {
+  const headerRef = useRef<HTMLElement | null>(null);
   const [scrollState, setScrollState] = useState<0 | 1 | 2>(0);
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -23,6 +25,8 @@ export function Navbar() {
   const openDrawer = useSelectionStore((s) => s.openDrawer);
   const mounted = useHydrated();
   const pathname = usePathname();
+  const setNavDrawerOpen = useUiOverlayStore((s) => s.setNavDrawerOpen);
+  const setSearchModalOpen = useUiOverlayStore((s) => s.setSearchOpen);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     if (latest > 80) setScrollState(2);
@@ -56,13 +60,49 @@ export function Navbar() {
     return () => observer.disconnect();
   }, [pathname]);
 
+  React.useEffect(() => {
+    setNavDrawerOpen(isNavDrawerOpen);
+  }, [isNavDrawerOpen, setNavDrawerOpen]);
+
+  React.useEffect(() => {
+    setSearchModalOpen(searchOpen);
+  }, [searchOpen, setSearchModalOpen]);
+
+  React.useEffect(() => {
+    return () => {
+      setNavDrawerOpen(false);
+      setSearchModalOpen(false);
+    };
+  }, [setNavDrawerOpen, setSearchModalOpen]);
+
+  React.useEffect(() => {
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
+
+    const root = document.documentElement;
+    const updateNavbarHeight = () => {
+      root.style.setProperty('--navbar-height', `${headerEl.offsetHeight}px`);
+    };
+
+    updateNavbarHeight();
+
+    const resizeObserver = new ResizeObserver(updateNavbarHeight);
+    resizeObserver.observe(headerEl);
+    window.addEventListener('resize', updateNavbarHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateNavbarHeight);
+    };
+  }, []);
+
   // Cuando scrollState > 0 el navbar tiene fondo oscuro — siempre usar íconos claros
   const isTransparent = scrollState === 0;
   const useDarkIcons = isTransparent && navScheme === 'light';
   const iconColorClass = useDarkIcons ? 'text-[var(--color-dark)]' : 'text-[var(--color-text-light)]';
 
   return (
-    <header className="fixed top-0 left-0 right-0 w-full flex flex-col" style={{ zIndex: 'var(--z-navbar)' }}>
+    <header ref={headerRef} className="fixed top-0 left-0 right-0 w-full flex flex-col" style={{ zIndex: 'var(--z-navbar)' }}>
       <div
         style={{
           background: 'var(--color-dark)',
@@ -139,18 +179,18 @@ export function Navbar() {
 
       <motion.nav
         className={cn(
-          'w-full min-h-[72px] h-[85px] md:h-[130px] mx-auto px-[var(--spacing-section-x)] transition-all duration-400 ease-in-out',
+          'navbar-main w-full min-h-[72px] h-[85px] md:h-[130px] mx-auto px-[var(--spacing-section-x)] transition-all duration-400 ease-in-out',
           'flex items-center justify-between',
           scrollState === 2 ? 'bg-[var(--color-dark)]' : scrollState === 1 ? 'bg-black/20 backdrop-blur-[8px]' : 'bg-transparent',
         )}
       >
-        <div className="flex-1 flex justify-start" style={{ paddingLeft: 'clamp(1.2rem, 4vw, 3rem)' }} />
+        <div className="navbar-left-spacer flex-1 flex justify-start" style={{ paddingLeft: 'clamp(1.2rem, 4vw, 3rem)' }} />
 
-        <div className="flex-none flex items-center justify-center shrink-0 py-4">
+        <div className="navbar-logo-wrap flex-none flex items-center justify-center shrink-0 py-4">
           <BanuLogo theme={useDarkIcons ? 'gold-dark' : 'light'} />
         </div>
 
-        <div className={`flex-1 flex justify-end items-center gap-6 ${iconColorClass}`} style={{ paddingRight: 'clamp(1.2rem, 4vw, 3rem)' }}>
+        <div className={`navbar-actions flex-1 flex justify-end items-center gap-6 ${iconColorClass}`} style={{ paddingRight: 'clamp(1.2rem, 4vw, 3rem)' }}>
           <button
             aria-label="Buscar"
             onClick={() => setSearchOpen(true)}

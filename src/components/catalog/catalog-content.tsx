@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { PerfumeData, BrandData } from '@/types/sanity'
@@ -41,6 +41,7 @@ const cardVariants = {
 
 export default function CatalogContent({ products, brands }: CatalogContentProps) {
   const searchParams = useSearchParams()
+  const catalogTopRef = useRef<HTMLDivElement | null>(null)
 
   const [filters, setFilters] = useState<FiltersState>(() => {
     const marca = searchParams.get('marca')
@@ -61,6 +62,7 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
   const handleFiltersChange = (f: FiltersState) => {
     setFilters(f)
     setPage(1)
+    requestAnimationFrame(() => scrollToCatalogTop())
   }
 
   const filtered = useMemo(() => {
@@ -110,24 +112,48 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
+  const scrollToCatalogTop = () => {
+    const root = catalogTopRef.current
+    if (!root) return
+
+    const navbarHeightVar = getComputedStyle(document.documentElement)
+      .getPropertyValue('--navbar-height')
+      .trim()
+      .replace('px', '')
+    const navbarHeight = Number.parseFloat(navbarHeightVar) || 0
+
+    const top = window.scrollY + root.getBoundingClientRect().top - navbarHeight
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  }
+
+  const goToPage = (targetPage: number) => {
+    const nextPage = Math.max(1, Math.min(totalPages, targetPage))
+    if (nextPage === page) return
+    setPage(nextPage)
+    requestAnimationFrame(() => scrollToCatalogTop())
+  }
+
   return (
-    <div style={{ background: 'var(--color-cream)', minHeight: '60vh', position: 'relative' }}>
+    <div ref={catalogTopRef} style={{ background: 'var(--color-cream)', minHeight: '60vh', position: 'relative' }}>
       <ArabicPatternOverlay opacity={0.04} color="dark" />
       <div
+        className="catalog-sticky-bar"
         style={{
           position: 'sticky',
           top: 'var(--navbar-height)',
           zIndex: 'var(--z-sticky)',
           background: 'var(--color-cream)',
           borderBottom: '1px solid rgba(44,24,16,0.1)',
-          height: '48px',
+          minHeight: '48px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 clamp(1rem, 4vw, 3rem)'
+          gap: '1rem',
+          padding: '0.5rem clamp(1rem, 4vw, 3rem)'
         }}
       >
         <p
+          className="catalog-filter-count"
           style={{
             fontFamily: 'var(--font-dm-sans)',
             fontSize: '0.65rem',
@@ -137,13 +163,20 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
             opacity: 0.45
           }}
         >
-          {filtered.length} {filtered.length === 1 ? 'fragancia' : 'fragancias'}
+          <span className="catalog-filter-count-number">{filtered.length}</span>{' '}
+          <span className="catalog-filter-count-label">{filtered.length === 1 ? 'fragancia' : 'fragancias'}</span>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <div className="catalog-filter-actions" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <select
+            className="catalog-sort-select"
             value={filters.sortBy}
-            onChange={(e) => setFilters((f) => ({ ...f, sortBy: e.target.value as FiltersState['sortBy'] }))}
+            onChange={(e) =>
+              handleFiltersChange({
+                ...filters,
+                sortBy: e.target.value as FiltersState['sortBy'],
+              })
+            }
             style={{
               fontFamily: 'var(--font-dm-sans)',
               fontSize: '0.7rem',
@@ -178,7 +211,7 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
               gap: '0.5rem',
             }}
             id="catalog-filter-btn"
-            className="opacity-50 hover:opacity-100 transition-opacity duration-300"
+            className="catalog-filter-button opacity-50 hover:opacity-100 transition-opacity duration-300"
           >
             Filtros
             {(filters.selectedBrands.length + filters.selectedTags.length) > 0 && (
@@ -229,7 +262,7 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
 
           {/* PAGINACIÓN */}
           {totalPages > 1 && (
-            <div style={{
+            <div className="catalog-pagination" style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -239,11 +272,14 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
             }}>
               {/* Flecha izquierda */}
               <button
-                onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="catalog-pagination-arrow"
+                onClick={() => goToPage(page - 1)}
                 disabled={page === 1}
                 aria-label="Página anterior"
                 style={{
                   width: 40, height: 40,
+                  minHeight: 40,
+                  padding: 0,
                   border: '1px solid',
                   borderColor: page === 1 ? 'rgba(44,24,16,0.15)' : 'rgba(44,24,16,0.4)',
                   background: 'transparent',
@@ -259,16 +295,22 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
               </button>
 
               {/* Indicador de página */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div className="catalog-pagination-indicators" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                   <button
                     key={n}
-                    onClick={() => { setPage(n); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={`catalog-pagination-dot ${n === page ? 'is-active' : ''}`}
+                    onClick={() => goToPage(n)}
                     style={{
                       width: n === page ? 28 : 8,
+                      minWidth: n === page ? 28 : 8,
                       height: 8,
+                      minHeight: 8,
                       background: n === page ? 'var(--color-gold)' : 'rgba(44,24,16,0.2)',
                       border: 'none',
+                      padding: 0,
+                      display: 'block',
+                      lineHeight: 0,
                       cursor: 'pointer',
                       transition: 'all 350ms ease',
                       flexShrink: 0,
@@ -281,11 +323,14 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
 
               {/* Flecha derecha */}
               <button
-                onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="catalog-pagination-arrow"
+                onClick={() => goToPage(page + 1)}
                 disabled={page === totalPages}
                 aria-label="Página siguiente"
                 style={{
                   width: 40, height: 40,
+                  minHeight: 40,
+                  padding: 0,
                   border: '1px solid',
                   borderColor: page === totalPages ? 'rgba(44,24,16,0.15)' : 'rgba(44,24,16,0.4)',
                   background: 'transparent',

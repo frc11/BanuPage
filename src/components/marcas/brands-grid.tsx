@@ -30,9 +30,11 @@ const cardVariants = {
 function BrandCard({ brand }: { brand: BrandData }) {
   const router = useRouter()
   const [hovered, setHovered] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   return (
     <motion.button
+      className="brand-card"
       variants={cardVariants}
       onClick={() => router.push(`/catalogo?marca=${encodeURIComponent(brand.name)}`)}
       onMouseEnter={() => setHovered(true)}
@@ -49,24 +51,30 @@ function BrandCard({ brand }: { brand: BrandData }) {
         cursor: 'pointer',
         transition: 'background 400ms ease',
         width: '100%',
-        minHeight: '200px'
+        minHeight: '200px',
+        textAlign: 'center'
       }}
     >
       {/* LOGO */}
-      <div style={{
+      <div
+        className="brand-card-logo-wrap"
+        style={{
         height: '60px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
         width: '100%'
-      }}>
-        {brand.logoUrl ? (
+      }}
+      >
+        {brand.logoUrl && !logoError ? (
           <Image
+            className="brand-card-logo-image"
             src={brand.logoUrl}
             alt={brand.name}
             width={120}
             height={60}
+            onError={() => setLogoError(true)}
             style={{
               objectFit: 'contain',
               height: '60px',

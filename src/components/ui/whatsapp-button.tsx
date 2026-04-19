@@ -1,14 +1,31 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSelectionStore } from '@/src/store/selection-store'
+import { useUiOverlayStore } from '@/src/store/ui-overlay-store'
 
 export default function WhatsAppButton() {
   const [hovered, setHovered] = useState(false)
   const pathname = usePathname()
+  const isSelectionOpen = useSelectionStore((s) => s.isOpen)
+  const isNavDrawerOpen = useUiOverlayStore((s) => s.isNavDrawerOpen)
+  const isSearchOpen = useUiOverlayStore((s) => s.isSearchOpen)
+  const isMobile = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === 'undefined') return () => {}
+      const mediaQuery = window.matchMedia('(max-width: 768px)')
+      const handleChange = () => onStoreChange()
+      mediaQuery.addEventListener('change', handleChange)
+      return () => mediaQuery.removeEventListener('change', handleChange)
+    },
+    () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false),
+    () => false,
+  )
 
   if (pathname?.startsWith('/studio')) return null
+  if (isMobile && (isNavDrawerOpen || isSearchOpen || isSelectionOpen)) return null
 
   return (
     <div

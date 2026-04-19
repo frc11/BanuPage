@@ -222,7 +222,7 @@ export function SelectionMiniDrawer({ isOpen, onClose }: SelectionMiniDrawerProp
                       <button
                         onClick={() => removeItem(item.id)}
                         aria-label={`Quitar ${item.name}`}
-                        className="opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity duration-200 text-[var(--color-cream)] shrink-0"
+                        className="opacity-60 md:opacity-0 md:group-hover:opacity-60 md:hover:!opacity-100 transition-opacity duration-200 text-[var(--color-cream)] shrink-0"
                       >
                         <X size={14} strokeWidth={1.5} />
                       </button>

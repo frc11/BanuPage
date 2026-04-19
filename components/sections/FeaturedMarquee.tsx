@@ -43,7 +43,8 @@ export function FeaturedMarquee({ products }: FeaturedMarqueeProps) {
         <RevealText
           text="Descubrimientos Selectos"
           as="h2"
-          className="font-serif text-[clamp(2rem,6vw,3.5rem)] font-light text-[var(--color-text-light)] text-center"
+          className="font-serif text-[clamp(1.9rem,9vw,3.5rem)] leading-[1.12] font-light text-[var(--color-text-light)] text-center max-w-[12ch] sm:max-w-none mx-auto"
+          style={{ justifyContent: 'center', width: '100%' }}
         />
       </div>
 

@@ -107,7 +107,7 @@ export default function LoadingScreen() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Verificamos estado de sesión para mostrar sólo en primera visita
+    // Verificamos estado de sesion para mostrar solo en primera visita
     if (!sessionStorage.getItem("banu-loaded")) {
       setShow(true);
       setTimeout(() => {
@@ -127,11 +127,11 @@ export default function LoadingScreen() {
             opacity: 0,
             transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: 0.1 },
           }}
-          className="fixed inset-0 flex flex-col items-center justify-center bg-[var(--color-dark)] pointer-events-auto"
+          className="fixed inset-0 flex flex-col items-center justify-center bg-[var(--color-dark)] pointer-events-auto px-4"
           style={{ zIndex: 'var(--z-preloader)' as unknown as number }}
         >
           {/* 1. LOGO SVG ANIMADO */}
-          <div className="w-[320px] md:w-[440px] flex items-center justify-center relative">
+          <div className="w-[min(88vw,320px)] md:w-[440px] flex items-center justify-center relative">
             <svg
               viewBox="418 360 682 192"
               className="w-full h-auto"
@@ -162,12 +162,12 @@ export default function LoadingScreen() {
             </svg>
           </div>
 
-          {/* 2. LÍNEA DORADA */}
+          {/* 2. LINEA DORADA */}
           <motion.div
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 144, opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.4, ease: [0.25, 0.1, 0.25, 1] }}
-            className="h-[1px] bg-[var(--color-gold)] mt-5"
+            className="h-[1px] bg-[var(--color-gold)] mt-4 md:mt-5 w-[clamp(92px,34vw,144px)]"
           />
 
           {/* 3. TAGLINE */}
@@ -175,12 +175,12 @@ export default function LoadingScreen() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 0.45, y: 0 }}
             transition={{ duration: 0.5, delay: 1.7 }}
-            className="mt-5 font-sans text-[1.75rem] tracking-[0.4em] text-[var(--color-cream)] uppercase"
+            className="mt-4 md:mt-5 max-w-[92vw] text-center font-sans text-[clamp(0.9rem,5.2vw,1.75rem)] tracking-[0.2em] md:tracking-[0.4em] text-[var(--color-cream)] uppercase whitespace-nowrap"
           >
-            Perfumes Árabes
+            Perfumes {'\u00C1'}rabes
           </motion.div>
 
-          {/* 4. PATRÓN ÁRABE DE FONDO */}
+          {/* 4. PATRON ARABE DE FONDO */}
           <div className="absolute inset-0 z-[-1] opacity-[0.03] pointer-events-none">
             <ArabicPatternOverlay opacity={1} color="light" />
           </div>

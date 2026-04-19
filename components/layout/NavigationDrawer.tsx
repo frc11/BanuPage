@@ -97,11 +97,12 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={{ left: 0.3, right: 0 }}
             onDragEnd={(_, info) => { if (info.offset.x < -80) onClose(); }}
-            className="fixed top-0 left-0 bottom-0 w-full max-w-[480px] h-full shadow-2xl flex flex-col"
+            className="fixed top-0 left-0 bottom-0 w-full max-w-[480px] h-full shadow-2xl flex flex-col overflow-y-auto"
             style={{
               width: 'var(--nav-drawer-width, 100vw)',
               zIndex: 'var(--z-drawer)',
               background: 'var(--color-dark)',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             {/* Subtle pattern overlay */}
@@ -138,7 +139,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.05 }}
               style={{
-                padding: '2.5rem 2.5rem 0',
+                padding: 'clamp(1.25rem, 5vw, 2.5rem) clamp(1rem, 5vw, 2.5rem) 0',
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
@@ -155,7 +156,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                     alt="BANŪ"
                     width={300}
                     height={80}
-                    style={{ width: 'auto', height: '100px', opacity: 0.92 }}
+                    style={{ width: 'auto', height: 'clamp(62px, 18vw, 100px)', opacity: 0.92 }}
                     priority
                     unoptimized
                   />
@@ -177,7 +178,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              padding: '0 2.5rem',
+              padding: '0 clamp(1rem, 5vw, 2.5rem)',
             }}>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {primaryLinks.map((item, i) => (
@@ -192,12 +193,12 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                     <Link
                       href={item.href}
                       onClick={onClose}
-                      style={{ display: 'block', padding: '0.875rem 0', textDecoration: 'none', borderBottom: '1px solid rgba(234,230,223,0.06)' }}
+                      style={{ display: 'block', padding: '0.7rem 0', textDecoration: 'none', borderBottom: '1px solid rgba(234,230,223,0.06)' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.2rem' }}>
                         <span style={{
                           fontFamily: 'var(--font-cormorant)',
-                          fontSize: 'clamp(2rem, 5vw, 2.75rem)',
+                          fontSize: 'clamp(1.7rem, 7vw, 2.75rem)',
                           fontWeight: 300,
                           color: 'var(--color-cream)',
                           lineHeight: 1.1,
@@ -230,7 +231,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                       </div>
                       <span style={{
                         fontFamily: 'var(--font-dm-sans)',
-                        fontSize: '0.62rem',
+                        fontSize: 'clamp(0.56rem, 1.9vw, 0.62rem)',
                         letterSpacing: '0.08em',
                         color: 'var(--color-cream)',
                         opacity: 0.35,
@@ -249,7 +250,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               initial="hidden"
               animate="visible"
               style={{
-                padding: '1.5rem 2.5rem 2.5rem',
+                padding: '1.25rem clamp(1rem, 5vw, 2.5rem) calc(1.75rem + env(safe-area-inset-bottom))',
                 borderTop: '1px solid rgba(234,230,223,0.08)',
                 position: 'relative',
               }}
@@ -264,7 +265,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                 marginBottom: '1.25rem',
                 letterSpacing: '0.02em',
               }}>
-                "El perfume es el arte que hace memoria de las cosas invisibles."
+                &ldquo;El perfume es el arte que hace memoria de las cosas invisibles.&rdquo;
               </p>
 
               {/* Ubicación */}
@@ -276,8 +277,8 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                 </svg>
                 <span style={{
                   fontFamily: 'var(--font-dm-sans)',
-                  fontSize: '0.62rem',
-                  letterSpacing: '0.18em',
+                  fontSize: 'clamp(0.54rem, 1.8vw, 0.62rem)',
+                  letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   color: 'var(--color-cream)',
                   opacity: 0.45,
@@ -287,7 +288,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               </div>
 
               {/* Socials + WhatsApp */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', columnGap: '0.85rem', rowGap: '0.65rem' }}>
                 {/* WhatsApp */}
                 <a
                   href="https://wa.me/5493814665503"
@@ -305,12 +306,10 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
                   </svg>
-                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 'clamp(0.52rem, 1.7vw, 0.6rem)', letterSpacing: '0.11em', textTransform: 'uppercase' }}>
                     WhatsApp
                   </span>
                 </a>
-
-                <div style={{ width: '1px', height: '14px', background: 'rgba(234,230,223,0.15)' }} />
 
                 {/* Instagram */}
                 <a
@@ -329,12 +328,10 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                   </svg>
-                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 'clamp(0.52rem, 1.7vw, 0.6rem)', letterSpacing: '0.11em', textTransform: 'uppercase' }}>
                     Instagram
                   </span>
                 </a>
-
-                <div style={{ width: '1px', height: '14px', background: 'rgba(234,230,223,0.15)' }} />
 
                 {/* TikTok */}
                 <a
@@ -353,7 +350,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.69a4.85 4.85 0 0 1-1.01-.0z"/>
                   </svg>
-                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 'clamp(0.52rem, 1.7vw, 0.6rem)', letterSpacing: '0.11em', textTransform: 'uppercase' }}>
                     TikTok
                   </span>
                 </a>
@@ -365,3 +362,4 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
     </AnimatePresence>
   );
 }
+

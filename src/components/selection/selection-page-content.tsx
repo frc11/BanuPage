@@ -19,6 +19,7 @@ import { ArabicPatternOverlay } from "@/components/ui/ArabicPattern";
 function FilledState({ count }: { count: number }) {
   return (
     <div
+      className="selection-filled-state"
       style={{
         maxWidth: "1200px",
         margin: "0 auto",

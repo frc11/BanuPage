@@ -372,7 +372,7 @@ export function MiniSelectionDrawer() {
                     {/* Remove button */}
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
                       style={{
                         position: 'absolute',
                         right: 0,

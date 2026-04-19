@@ -78,12 +78,15 @@ export default function NosotrosPorQue() {
           {RAZONES.map((razon, i) => (
             <motion.div
               key={i}
+              className="porque-item"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
             >
-              <p style={{
+              <p
+                className="porque-item-number"
+                style={{
                 fontFamily: 'var(--font-cormorant)',
                 fontSize: '3rem',
                 fontWeight: 300,
@@ -95,15 +98,20 @@ export default function NosotrosPorQue() {
                 {razon.numero}
               </p>
 
-              <div style={{
+              <div
+                className="porque-item-divider"
+                style={{
                 width: '32px',
                 height: '1px',
                 background: 'var(--color-gold)',
                 opacity: 0.4,
                 marginBottom: '1.25rem'
-              }} />
+              }}
+              />
 
-              <p style={{
+              <p
+                className="porque-item-title"
+                style={{
                 fontFamily: 'var(--font-cormorant)',
                 fontSize: '1.25rem',
                 fontWeight: 400,
@@ -114,7 +122,9 @@ export default function NosotrosPorQue() {
                 {razon.titulo}
               </p>
 
-              <p style={{
+              <p
+                className="porque-item-body"
+                style={{
                 fontFamily: 'var(--font-dm-sans)',
                 fontSize: '0.8rem',
                 color: 'var(--color-dark)',

@@ -48,7 +48,7 @@ export function Footer() {
           zIndex: 10,
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '5rem 2.5rem 0',
+          padding: 'clamp(3.25rem, 8vw, 5rem) clamp(1rem, 5vw, 2.5rem) 0',
         }}
       >
         {/* Fila superior: Logo centrado */}
@@ -64,12 +64,13 @@ export function Footer() {
           <span
             style={{
               fontFamily: 'var(--font-sans, sans-serif)',
-              fontSize: '0.62rem',
-              letterSpacing: '0.32em',
+              fontSize: 'clamp(0.56rem, 1.8vw, 0.62rem)',
+              letterSpacing: '0.26em',
               textTransform: 'uppercase',
               color: 'var(--color-gold)',
               opacity: 0.65,
               marginTop: '0.75rem',
+              textAlign: 'center',
             }}
           >
             Perfumes Árabes · Argentina
@@ -81,10 +82,8 @@ export function Footer() {
 
         {/* Grid: 3 columnas */}
         <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-8 w-full"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '2rem',
             width: '100%',
           }}
         >

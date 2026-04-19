@@ -37,6 +37,7 @@ export default function NosotrosContacto() {
         <RevealText
           text="¿Querés asesoramiento personalizado?"
           as="h2"
+          className="contacto-title"
           style={{
             fontFamily: 'var(--font-cormorant)',
             fontSize: 'clamp(2rem, 4vw, 3.5rem)',
