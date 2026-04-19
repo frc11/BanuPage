@@ -65,11 +65,8 @@ export const useSelectionStore = create<SelectionStore>()(
 
       addItem: (item) => {
         const exists = get().items.some((i) => i.id === item.id);
-        if (exists) {
-          set({ isOpen: true });
-          return;
-        }
-        set((state) => ({ items: [...state.items, item], isOpen: true }));
+        if (exists) return;
+        set((state) => ({ items: [...state.items, item] }));
         get().addToast('Agregado a tu selección', 'success');
       },
 

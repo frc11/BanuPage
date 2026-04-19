@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { X } from "lucide-react";
+import { X, ShoppingBag } from "lucide-react";
 import { useSelectionStore } from "@/src/store/selection-store";
 import { useHydrated } from "@/src/hooks/use-hydrated";
 
@@ -13,14 +13,14 @@ import { useHydrated } from "@/src/hooks/use-hydrated";
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const drawerVariants = {
-  hidden: { x: "100%", opacity: 0 },
+  hidden: { x: "-100%", opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
     transition: { duration: 0.35, ease: EASE },
   },
   exit: {
-    x: "100%",
+    x: "-100%",
     opacity: 0,
     transition: { duration: 0.25, ease: EASE },
   },
@@ -56,7 +56,9 @@ export function MiniSelectionDrawer() {
   const items = useSelectionStore((s) => s.items);
   const isOpen = useSelectionStore((s) => s.isOpen);
   const closeDrawer = useSelectionStore((s) => s.closeDrawer);
+  const removeItem = useSelectionStore((s) => s.removeItem);
   const generateWhatsAppUrl = useSelectionStore((s) => s.generateWhatsAppUrl);
+  const scrollYRef = useRef(0);
 
   // Auto-cerrar cuando el usuario llega a /seleccion
   useEffect(() => {
@@ -65,20 +67,25 @@ export function MiniSelectionDrawer() {
     }
   }, [pathname, isOpen, closeDrawer]);
 
-  // Lock scroll
+  // Lock scroll sin perder la posición
   useEffect(() => {
     if (isOpen) {
+      scrollYRef.current = window.scrollY;
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
       document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
       document.body.style.position = '';
+      document.body.style.top = '';
       document.body.style.width = '';
+      window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior });
     }
-    return () => { 
+    return () => {
       document.body.style.overflow = '';
       document.body.style.position = '';
+      document.body.style.top = '';
       document.body.style.width = '';
     };
   }, [isOpen]);
@@ -89,8 +96,8 @@ export function MiniSelectionDrawer() {
   // que servidor y cliente renderizan el mismo output inicial.
   if (!mounted) return null;
 
-  // El último item agregado es el más reciente del array
-  const lastItem = items.length > 0 ? items[items.length - 1] : null;
+  // Mostrar hasta 5 ítems recientes en lugar de solo el último
+  const recentItems = [...items].reverse().slice(0, 6);
   const count = items.length;
 
   const handleWhatsApp = () => {
@@ -113,8 +120,12 @@ export function MiniSelectionDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden fixed inset-0 bg-[rgba(44,24,16,0.4)]"
-            style={{ zIndex: 'calc(var(--z-selection-drawer) - 1)' }}
+            className="fixed inset-0 cursor-pointer"
+            style={{
+              background: 'rgba(44, 24, 16, 0.65)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 'calc(var(--z-selection-drawer) - 1)'
+            }}
             onClick={closeDrawer}
             aria-hidden="true"
           />
@@ -123,7 +134,7 @@ export function MiniSelectionDrawer() {
 
       {/* ── Drawer ──────────────────────────────────────────────────────── */}
       <AnimatePresence>
-        {isOpen && lastItem && (
+        {isOpen && (
           <motion.aside
             key="mini-drawer"
             role="dialog"
@@ -135,23 +146,23 @@ export function MiniSelectionDrawer() {
             exit="exit"
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={{ left: 0, right: 0.3 }}
+            dragElastic={{ left: 0.3, right: 0 }}
             onDragEnd={(_, info) => {
-              // Si recarga a la derecha y rebota
-              if (info.offset.x > 80) closeDrawer();
+              if (info.offset.x < -80) closeDrawer();
             }}
-            className="fixed-bottom"
+            className="fixed top-0 left-0 bottom-0 flex flex-col"
             style={{
               position: "fixed",
-              top: "var(--navbar-height)",
-              right: 0,
+              top: 0,
+              left: 0,
+              bottom: 0,
               zIndex: "var(--z-selection-drawer)",
-              width: "380px",
+              width: "480px",
               maxWidth: "100vw",
-              maxHeight: "calc(100vh - var(--navbar-height))",
+              height: "100%",
               overflowY: "auto",
               backgroundColor: "var(--color-cream)",
-              boxShadow: "-4px 0 24px rgba(44,24,16,0.12)",
+              boxShadow: "4px 0 24px rgba(44,24,16,0.12)",
             }}
           >
             {/* ── Header ────────────────────────────────────────────────── */}
@@ -159,6 +170,7 @@ export function MiniSelectionDrawer() {
               style={{
                 position: "relative",
                 padding: "1.5rem",
+                paddingTop: "2.5rem",
                 borderBottom: "1px solid rgba(44,24,16,0.1)",
                 textAlign: "center",
               }}
@@ -181,27 +193,69 @@ export function MiniSelectionDrawer() {
                 aria-label="Cerrar selección"
                 style={{
                   position: "absolute",
-                  top: "1rem",
-                  right: "1rem",
-                  width: "32px",
-                  height: "32px",
-                  backgroundColor: "var(--color-dark)",
-                  color: "var(--color-text-light)",
+                  top: "1.75rem",
+                  right: "1.5rem",
+                  width: "44px",
+                  height: "44px",
+                  border: "1px solid rgba(44,24,16,0.15)",
+                  color: "var(--color-dark)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  border: "none",
+                  backgroundColor: "transparent",
                   cursor: "pointer",
-                  borderRadius: 0,
-                  flexShrink: 0,
+                  transition: "border-color 200ms ease, opacity 200ms ease",
+                  opacity: 0.7,
                 }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.opacity = "1")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.opacity = "0.7")}
               >
-                <X size={14} strokeWidth={1.5} />
+                <X size={18} strokeWidth={1.5} />
               </button>
             </div>
 
-            {/* ── Último item agregado ──────────────────────────────────── */}
-            <div style={{ padding: "1.5rem" }}>
+            {recentItems.length === 0 ? (
+              <div style={{ padding: "3rem 1.5rem", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", flex: 1, marginTop: "auto", marginBottom: "auto" }}>
+                <ShoppingBag size={48} strokeWidth={1} style={{ opacity: 0.2, marginBottom: "1.5rem", color: "var(--color-dark)" }} />
+                <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "1.25rem", color: "var(--color-dark)", marginBottom: "0.5rem" }}>
+                  Aún no tienes perfumes seleccionados
+                </h3>
+                <p style={{ fontFamily: "var(--font-dm-sans), sans-serif", fontSize: "0.85rem", color: "var(--color-dark)", opacity: 0.6, marginBottom: "2rem" }}>
+                  Explorá nuestro catálogo y agregalos aquí.
+                </p>
+                <button
+                  onClick={() => {
+                    closeDrawer();
+                    router.push('/catalogo');
+                  }}
+                  style={{
+                    padding: "0.8rem 1.5rem",
+                    border: "1px solid var(--color-dark)",
+                    backgroundColor: "transparent",
+                    color: "var(--color-dark)",
+                    fontFamily: "var(--font-dm-sans), sans-serif",
+                    fontSize: "0.7rem",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--color-dark)";
+                    e.currentTarget.style.color = "var(--color-cream)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "var(--color-dark)";
+                  }}
+                >
+                  Ir al catálogo
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* ── Últimos items agregados ──────────────────────────────────── */}
+                <div style={{ padding: "1.5rem" }}>
               {/* Label */}
               <p
                 style={{
@@ -211,112 +265,141 @@ export function MiniSelectionDrawer() {
                   textTransform: "uppercase",
                   color: "var(--color-dark)",
                   opacity: 0.45,
-                  marginBottom: "0.75rem",
+                  marginBottom: "1.25rem",
                 }}
               >
-                SE HA AGREGADO A TU SELECCIÓN
+                TU SELECCIÓN RECIENTE
               </p>
 
-              {/* Item row */}
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                {/* Thumbnail 60×60 */}
-                <div
-                  style={{
-                    width: "60px",
-                    height: "60px",
-                    flexShrink: 0,
-                    backgroundColor: "var(--color-cream-dark)",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  {lastItem.imageUrl ? (
-                    <Image
-                      src={lastItem.imageUrl}
-                      alt={lastItem.name}
-                      fill
-                      unoptimized
-                      style={{ objectFit: "contain", padding: "4px" }}
-                    />
-                  ) : (
+              {/* Items list */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                {recentItems.map((item) => (
+                  <div key={item.id} className="group relative" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                    {/* Thumbnail 60×60 */}
                     <div
                       style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        opacity: 0.25,
+                        width: "60px",
+                        height: "60px",
+                        flexShrink: 0,
+                        backgroundColor: "var(--color-cream-dark)",
+                        position: "relative",
+                        overflow: "hidden",
                       }}
                     >
-                      <span style={{ fontSize: "1.5rem" }}>◈</span>
+                      {item.imageUrl ? (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          fill
+                          unoptimized
+                          style={{ objectFit: "contain", padding: "4px" }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            opacity: 0.25,
+                          }}
+                        >
+                          <span style={{ fontSize: "1.5rem" }}>◈</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  {lastItem.brand && (
-                    <p
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0, paddingRight: '2rem' }}>
+                      {item.brand && (
+                        <p
+                          style={{
+                            fontFamily: "var(--font-dm-sans), sans-serif",
+                            fontSize: "0.6rem",
+                            letterSpacing: "0.15em",
+                            textTransform: "uppercase",
+                            color: "var(--color-gold)",
+                            marginBottom: "0.25rem",
+                          }}
+                        >
+                          {item.brand}
+                        </p>
+                      )}
+                      <h4
+                        style={{
+                          fontFamily: "var(--font-cormorant), serif",
+                          fontSize: "0.95rem",
+                          fontWeight: 400,
+                          color: "var(--color-dark)",
+                          lineHeight: 1.3,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {item.name}
+                      </h4>
+                      {item.price > 0 ? (
+                        <p
+                          style={{
+                            fontFamily: "var(--font-dm-sans), sans-serif",
+                            fontSize: "0.85rem",
+                            color: "var(--color-dark)",
+                            marginTop: "0.25rem",
+                            fontWeight: 500,
+                          }}
+                        >
+                          USD {item.price.toLocaleString("es-AR")}
+                        </p>
+                      ) : (
+                        <p
+                          style={{
+                            fontFamily: "var(--font-dm-sans), sans-serif",
+                            fontSize: "0.65rem",
+                            letterSpacing: "0.15em",
+                            textTransform: "uppercase",
+                            color: "var(--color-gold)",
+                            marginTop: "0.25rem",
+                            opacity: 0.7,
+                          }}
+                        >
+                          Consultar precio
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Remove button */}
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                       style={{
-                        fontFamily: "var(--font-dm-sans), sans-serif",
-                        fontSize: "0.6rem",
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        color: "var(--color-gold)",
-                        marginBottom: "0.25rem",
+                        position: 'absolute',
+                        right: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(44,24,16,0.05)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--color-dark)',
                       }}
+                      aria-label="Eliminar producto"
                     >
-                      {lastItem.brand}
-                    </p>
-                  )}
-                  <h4
-                    style={{
-                      fontFamily: "var(--font-cormorant), serif",
-                      fontSize: "0.95rem",
-                      fontWeight: 400,
-                      color: "var(--color-dark)",
-                      lineHeight: 1.3,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {lastItem.name}
-                  </h4>
-                  {lastItem.price > 0 ? (
-                    <p
-                      style={{
-                        fontFamily: "var(--font-dm-sans), sans-serif",
-                        fontSize: "0.85rem",
-                        color: "var(--color-dark)",
-                        marginTop: "0.25rem",
-                        fontWeight: 500,
-                      }}
-                    >
-                      USD {lastItem.price.toLocaleString("es-AR")}
-                    </p>
-                  ) : (
-                    <p
-                      style={{
-                        fontFamily: "var(--font-dm-sans), sans-serif",
-                        fontSize: "0.65rem",
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        color: "var(--color-gold)",
-                        marginTop: "0.25rem",
-                        opacity: 0.7,
-                      }}
-                    >
-                      Consultar precio
-                    </p>
-                  )}
-                </div>
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* ── Contador (si hay más de 1 item) ──────────────────────── */}
-            {count > 1 && (
+            {/* ── Contador (remanente si hay más de 5) ──────────────────────── */}
+            {count > 5 && (
               <div
                 style={{
                   padding: "0.75rem 1.5rem",
@@ -332,7 +415,7 @@ export function MiniSelectionDrawer() {
                     opacity: 0.6,
                   }}
                 >
-                  {count} perfumes en tu selección
+                  y {count - 6} perfumes más en tu selección
                 </p>
               </div>
             )}
@@ -340,6 +423,7 @@ export function MiniSelectionDrawer() {
             {/* ── CTAs ──────────────────────────────────────────────────── */}
             <div
               style={{
+                marginTop: "auto",
                 padding: "1.5rem",
                 paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))",
                 display: "flex",
@@ -431,6 +515,8 @@ export function MiniSelectionDrawer() {
                 </button>
               </div>
             </div>
+            </>
+            )}
           </motion.aside>
         )}
       </AnimatePresence>

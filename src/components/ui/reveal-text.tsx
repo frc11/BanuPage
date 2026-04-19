@@ -59,7 +59,16 @@ export default function RevealText({
       animate={isInView ? 'visible' : 'hidden'}
       style={{ perspective: '800px' }}
     >
-      <Tag className={className} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25em', ...style }}>
+      <Tag
+        className={className}
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.25em',
+          justifyContent: style?.textAlign === 'center' ? 'center' : style?.textAlign === 'right' ? 'flex-end' : 'flex-start',
+          ...style,
+        }}
+      >
         {words.map((word, i) => (
           <motion.span
             key={i}

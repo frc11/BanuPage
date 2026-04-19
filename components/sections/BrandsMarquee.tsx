@@ -1,123 +1,186 @@
-"use client";
+'use client';
 
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { BrandData } from '@/types/sanity';
+import { Marquee } from '@/components/ui/Marquee';
+import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern';
 
 export interface BrandsMarqueeProps {
   brands: BrandData[];
 }
 
-export function BrandsMarquee({ brands }: BrandsMarqueeProps) {
-  if (!brands || brands.length === 0) return null;
-  const router = useRouter();
+const MIN_BRANDS_FOR_CAROUSEL = 5;
+const BRAND_TILE_WIDTH = 'clamp(180px, 20vw, 320px)';
+const BRAND_TILE_MIN_HEIGHT = 'clamp(110px, 12vw, 170px)';
+const BRAND_LOGO_HEIGHT = 'clamp(54px, 7vw, 96px)';
 
-  // Duplicar x2 para seamless loop 0 → -50%
-  const marqueeContent = [...brands, ...brands];
+interface BrandTileProps {
+  brand: BrandData;
+  onActivate: () => void;
+}
+
+function BrandTile({ brand, onActivate }: BrandTileProps) {
+  return (
+    <button
+      onClick={onActivate}
+      aria-label={`Ver perfumes de ${brand.name}`}
+      style={{
+        width: BRAND_TILE_WIDTH,
+        minHeight: BRAND_TILE_MIN_HEIGHT,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        opacity: 0.78,
+        transition: 'opacity 220ms ease',
+        padding: '0.75rem 1rem',
+        flexShrink: 0,
+      }}
+      onMouseEnter={(event) => {
+        event.currentTarget.style.opacity = '1';
+      }}
+      onMouseLeave={(event) => {
+        event.currentTarget.style.opacity = '0.78';
+      }}
+    >
+      {brand.logoUrl ? (
+        <Image
+          src={brand.logoUrl}
+          alt={brand.name}
+          width={400}
+          height={120}
+          unoptimized
+          style={{
+            width: 'auto',
+            height: BRAND_LOGO_HEIGHT,
+            maxWidth: '100%',
+            objectFit: 'contain',
+            filter: 'brightness(0)',
+          }}
+        />
+      ) : (
+        <span
+          style={{
+            fontFamily: 'var(--font-cormorant)',
+            fontSize: 'clamp(1rem, 1.9vw, 1.8rem)',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: 'var(--color-dark)',
+            opacity: 0.85,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {brand.name}
+        </span>
+      )}
+    </button>
+  );
+}
+
+export function BrandsMarquee({ brands }: BrandsMarqueeProps) {
+  const router = useRouter();
+  const sectionPaddingTop = 'var(--spacing-section-top)';
+  const sectionPaddingBottom = 'var(--spacing-section-bottom)';
+
+  if (!brands || brands.length === 0) return null;
+
+  const isCarousel = brands.length >= MIN_BRANDS_FOR_CAROUSEL;
 
   return (
     <section
-      className="w-full bg-[var(--color-cream)] overflow-hidden select-none"
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      className="w-full bg-[var(--color-cream)] overflow-hidden select-none px-[var(--spacing-section-x)] relative"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: sectionPaddingTop,
+        paddingBottom: sectionPaddingBottom,
+      }}
     >
-      {/* Label Box */}
+      <ArabicPatternOverlay opacity={0.04} color="dark" />
       <div
         style={{
-          paddingTop: '1.5rem',
-          paddingBottom: '0.75rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '0.5rem',
+          gap: 'var(--spacing-sm)',
           width: '100%',
-          textAlign: 'center'
+          textAlign: 'center',
+          marginBottom: 'var(--spacing-lg)',
         }}
       >
-        <motion.span
-          initial={{ opacity: 0, y: 4 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="font-sans text-[0.65rem] tracking-[0.3em] uppercase text-[var(--color-gold)]"
-        >
-          Selección de Casas
-        </motion.span>
-        <div className="w-[40px] h-[1px] bg-[var(--color-gold)] opacity-40" />
+          <motion.span
+            initial={{ opacity: 0, y: 4 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-sans text-[clamp(1.1rem,2.5vw,1.6rem)] tracking-[0.28em] uppercase text-[var(--color-gold)]"
+          >
+            Seleccion de Casas
+          </motion.span>
+        <div className="w-[58px] h-[1px] bg-[var(--color-gold)] opacity-45" />
       </div>
 
-      {/* Track Wrapper con Mask Image */}
-      <div
-        className="w-full relative group"
-        style={{
-          paddingBottom: '1.5rem',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
-          maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      {isCarousel ? (
         <div
-          className="flex flex-nowrap items-center whitespace-nowrap min-w-max"
-          style={{ animation: 'marquee-brands 35s linear infinite' }}
+          className="w-full"
+          style={{
+            overflow: 'hidden',
+            WebkitMaskImage:
+              'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+            maskImage:
+              'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+          }}
         >
-          {marqueeContent.map((brand, index) => (
-            <React.Fragment key={`${brand._id}-${index}`}>
-              {/* Logo clickeable */}
-              <div
-                onClick={() => router.push(`/catalogo?marca=${encodeURIComponent(brand.name)}`)}
-                style={{
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '0 2.5rem',
-                  opacity: 0.6,
-                  transition: 'opacity 300ms ease',
-                  flexShrink: 0,
-                }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
-                aria-label={`Ver perfumes de ${brand.name}`}
-                role="button"
-                tabIndex={index < brands.length ? 0 : -1}
-              >
-                {brand.logoUrl ? (
-                  <Image
-                    src={brand.logoUrl}
-                    alt={brand.name}
-                    width={150}
-                    height={50}
-                    unoptimized
-                    style={{
-                      objectFit: 'contain',
-                      height: '36px',
-                      width: 'auto',
-                      filter: 'brightness(0)',
-                    }}
-                  />
-                ) : (
-                  <span className="font-serif text-[1.1rem] tracking-[0.15em] text-[var(--color-dark)] opacity-70 font-normal uppercase">
-                    {brand.name}
-                  </span>
-                )}
-              </div>
-
-              {/* Separador */}
-              <span
-                className="font-serif text-[1rem] text-[var(--color-gold)] opacity-30 shrink-0 select-none"
-              >
-                ◆
-              </span>
-            </React.Fragment>
-          ))}
+          <Marquee speed={38} direction="left" align="center" className="hide-scrollbar [--marquee-gap:var(--spacing-md)] [--marquee-padding:0px]">
+            {brands.map((brand) => (
+              <BrandTile
+                key={brand._id}
+                brand={brand}
+                onActivate={() => router.push(`/catalogo?marca=${encodeURIComponent(brand.name)}`)}
+              />
+            ))}
+          </Marquee>
         </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes marquee-brands {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
-      ` }} />
+      ) : (
+        <div
+          style={{
+            width: '100%',
+            maxWidth: 'min(1880px, 96vw)',
+            padding: '0',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${brands.length}, minmax(0, 1fr))`,
+              alignItems: 'stretch',
+              gap: 'var(--spacing-card)',
+              width: '100%',
+            }}
+          >
+            {brands.map((brand) => (
+              <div
+                key={brand._id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <BrandTile
+                  brand={brand}
+                  onActivate={() => router.push(`/catalogo?marca=${encodeURIComponent(brand.name)}`)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

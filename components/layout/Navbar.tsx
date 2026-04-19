@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
@@ -9,38 +9,71 @@ import { useSelectionStore, useSelectionCount } from '@/src/store/selection-stor
 import { useHydrated } from '@/src/hooks/use-hydrated';
 import { cn } from '@/lib/utils';
 import SearchModal from '@/src/components/ui/search-modal';
+import { usePathname } from 'next/navigation';
 
 export function Navbar() {
   const [scrollState, setScrollState] = useState<0 | 1 | 2>(0);
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [navScheme, setNavScheme] = useState<'light' | 'dark'>('dark');
 
   const { scrollY } = useScroll();
 
-  // Selectores granulares — solo re-renderiza cuando su slice cambia
   const count = useSelectionCount();
   const openDrawer = useSelectionStore((s) => s.openDrawer);
   const mounted = useHydrated();
+  const pathname = usePathname();
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
+  useMotionValueEvent(scrollY, 'change', (latest) => {
     if (latest > 80) setScrollState(2);
     else if (latest > 20) setScrollState(1);
     else setScrollState(0);
   });
 
+  // Detecta secciones con data-navtheme para alternar íconos en estado transparente.
+  // Se re-ejecuta en cada cambio de ruta para no heredar el scheme de la página anterior.
+  React.useEffect(() => {
+    // Reset siempre al oscuro (default seguro)
+    setNavScheme('dark');
+
+    const elements = document.querySelectorAll('[data-navtheme]');
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          const theme = (visible[0].target as HTMLElement).dataset.navtheme as 'light' | 'dark';
+          setNavScheme(theme || 'dark');
+        }
+      },
+      { threshold: 0, rootMargin: '0px 0px -60% 0px' }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  // Cuando scrollState > 0 el navbar tiene fondo oscuro — siempre usar íconos claros
+  const isTransparent = scrollState === 0;
+  const useDarkIcons = isTransparent && navScheme === 'light';
+  const iconColorClass = useDarkIcons ? 'text-[var(--color-dark)]' : 'text-[var(--color-text-light)]';
+
   return (
     <header className="fixed top-0 left-0 right-0 w-full flex flex-col" style={{ zIndex: 'var(--z-navbar)' }}>
-      {/* Topbar utilitaria */}
-      {/* Topbar utilitaria */}
-      <div style={{
-        background: 'var(--color-dark)',
-        height: '36px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',  /* CENTRADO — no a la izquierda */
-        position: 'relative',
-        padding: '0 1.5rem'
-      }}>
+      <div
+        style={{
+          background: 'var(--color-dark)',
+          minHeight: '36px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          padding: '0.6rem var(--spacing-md)',
+        }}
+      >
         <a
           href="https://wa.me/5493814665503"
           target="_blank"
@@ -48,89 +81,91 @@ export function Navbar() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.625rem',
-            textDecoration: 'none'
+            gap: 'var(--spacing-xs)',
+            textDecoration: 'none',
+            width: '100%',
+            justifyContent: 'center',
+            textAlign: 'center',
           }}
         >
-          {/* Prefijo dorado */}
-          <span style={{
-            color: 'var(--color-gold)',
-            fontSize: '0.6rem',
-            letterSpacing: '0.1em'
-          }}>+</span>
+          <span
+            style={{
+              color: 'var(--color-gold)',
+              fontSize: '0.6rem',
+              letterSpacing: '0.08em',
+            }}
+          >
+            +
+          </span>
 
-          {/* Texto */}
-          <span style={{
-            fontFamily: 'var(--font-dm-sans)',
-            fontSize: '0.62rem',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: 'var(--color-cream)',
-            opacity: 0.75,
-            transition: 'opacity 200ms ease'
-          }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-dm-sans)',
+              fontSize: '0.62rem',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--color-cream)',
+              opacity: 0.75,
+              transition: 'opacity 200ms ease',
+            }}
+          >
             Contactanos por WhatsApp
           </span>
 
-          {/* Separador decorativo */}
-          <span style={{
-            color: 'var(--color-gold)',
-            opacity: 0.3,
-            fontSize: '0.5rem',
-            margin: '0 0.25rem'
-          }}>◆</span>
+          <span
+            style={{
+              color: 'var(--color-gold)',
+              opacity: 0.3,
+              fontSize: '0.5rem',
+              margin: '0 var(--spacing-sm)',
+            }}
+          >
+            {'\u25C6'}
+          </span>
 
-          {/* Horario o tagline */}
-          <span style={{
-            fontFamily: 'var(--font-dm-sans)',
-            fontSize: '0.6rem',
-            letterSpacing: '0.15em',
-            color: 'var(--color-cream)',
-            opacity: 0.4
-          }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-dm-sans)',
+              fontSize: '0.6rem',
+              letterSpacing: '0.08em',
+              color: 'var(--color-cream)',
+              opacity: 0.4,
+            }}
+          >
             Respuesta en menos de 24hs
           </span>
         </a>
       </div>
 
-      {/* Navbar Principal */}
       <motion.nav
         className={cn(
-          "w-full h-[85px] md:h-[130px] flex items-center justify-between px-6 lg:px-12 transition-all duration-400 ease-in-out",
-          scrollState === 2
-            ? "bg-[var(--color-dark)]"
-            : scrollState === 1
-            ? "bg-black/20 backdrop-blur-[8px]"
-            : "bg-transparent"
+          'w-full min-h-[72px] h-[85px] md:h-[130px] mx-auto px-[var(--spacing-section-x)] transition-all duration-400 ease-in-out',
+          'flex items-center justify-between',
+          scrollState === 2 ? 'bg-[var(--color-dark)]' : scrollState === 1 ? 'bg-black/20 backdrop-blur-[8px]' : 'bg-transparent',
         )}
       >
-        {/* Placeholder izquierdo para centering */}
-        <div className="flex-1 flex justify-start" />
+        <div className="flex-1 flex justify-start" style={{ paddingLeft: 'clamp(1.2rem, 4vw, 3rem)' }} />
 
-        {/* Logo */}
-        <div className="flex-none flex items-center justify-center shrink-0">
-          <BanuLogo theme="light" />
+        <div className="flex-none flex items-center justify-center shrink-0 py-4">
+          <BanuLogo theme={useDarkIcons ? 'gold-dark' : 'light'} />
         </div>
 
-        {/* Acciones Derechas */}
-        <div className="flex-1 flex justify-end items-center gap-[1.5rem] text-[var(--color-text-light)]">
+        <div className={`flex-1 flex justify-end items-center gap-6 ${iconColorClass}`} style={{ paddingRight: 'clamp(1.2rem, 4vw, 3rem)' }}>
           <button
             aria-label="Buscar"
             onClick={() => setSearchOpen(true)}
-            className="opacity-80 hover:opacity-100 transition-opacity duration-200"
+            className="shrink-0 inline-flex items-center justify-center leading-none opacity-80 hover:opacity-100 transition-opacity duration-200"
           >
             <Search size={18} strokeWidth={1.5} />
           </button>
 
-          {/* Mi Selección — abre el MiniSelectionDrawer */}
           <button
             id="navbar-selection-btn"
-            aria-label={mounted ? `Mi Selección — ${count} ${count === 1 ? 'item' : 'items'}` : 'Mi Selección'}
+            aria-label={mounted ? `Mi Selecci\u00F3n \u2014 ${count} ${count === 1 ? 'item' : 'items'}` : 'Mi Selecci\u00F3n'}
             onClick={openDrawer}
-            className="relative opacity-80 hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+            className="relative shrink-0 inline-flex items-center justify-center leading-none opacity-80 hover:opacity-100 transition-opacity duration-200 cursor-pointer"
           >
             <ShoppingBag size={20} strokeWidth={1.5} />
-            {/* Badge: sólo después de hidratación para evitar mismatch con localStorage */}
             {mounted && (
               <AnimatePresence>
                 {count > 0 && (
@@ -149,16 +184,18 @@ export function Navbar() {
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
                     }}
                   >
-                    <span style={{
-                      fontFamily: 'var(--font-dm-sans)',
-                      fontSize: '0.5rem',
-                      fontWeight: 600,
-                      color: 'var(--color-cream)',
-                      lineHeight: 1
-                    }}>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-dm-sans)',
+                        fontSize: '0.5rem',
+                        fontWeight: 600,
+                        color: 'var(--color-cream)',
+                        lineHeight: 1,
+                      }}
+                    >
                       {count > 9 ? '9+' : count}
                     </span>
                   </motion.div>
@@ -167,24 +204,12 @@ export function Navbar() {
             )}
           </button>
 
-          <a
-            href="https://wa.me/5493814665503"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp"
-            className="opacity-80 hover:opacity-100 transition-opacity duration-200"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-            </svg>
-          </a>
-
           <button
             onClick={() => setIsNavDrawerOpen(true)}
-            className="nav-link opacity-80 hover:opacity-100 transition-opacity duration-200 flex items-center gap-2"
+            className="nav-link !inline-flex items-center flex-nowrap gap-[var(--spacing-xs)] !pb-0 whitespace-nowrap leading-none shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-200"
           >
-            <span className="hidden md:inline-block">MENÚ</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <span className="hidden md:inline-block leading-none whitespace-nowrap">{'MEN\u00DA'}</span>
+            <svg className="shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="3" y1="6" x2="21" y2="6" />
               <line x1="4.5" y1="12" x2="21" y2="12" />
               <line x1="6" y1="18" x2="21" y2="18" />
@@ -193,7 +218,6 @@ export function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Navigation Drawer lateral izquierdo */}
       <NavigationDrawer isOpen={isNavDrawerOpen} onClose={() => setIsNavDrawerOpen(false)} />
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>

@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
-import Image from 'next/image'
 import { sanityFetch } from '@/lib/sanity'
-import { SUGGESTED_PRODUCTS_QUERY } from '@/lib/queries'
+import { ProductCard } from '@/components/ui/ProductCard'
+import { ALL_PRODUCTS_QUERY } from '@/lib/queries'
 import { PerfumeData } from '@/types/sanity'
 import RevealText from '@/src/components/ui/reveal-text'
+import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern'
 
 interface SuggestedProductsProps {
   currentId: string
@@ -16,11 +16,45 @@ export default function SuggestedProducts({ currentId }: SuggestedProductsProps)
   const [products, setProducts] = useState<PerfumeData[]>([])
 
   useEffect(() => {
-    sanityFetch<PerfumeData[]>({ query: SUGGESTED_PRODUCTS_QUERY })
+    sanityFetch<PerfumeData[]>({ query: ALL_PRODUCTS_QUERY })
       .then(data => {
-        // Excluir el producto actual
-        const filtered = (data ?? []).filter(p => p._id !== currentId)
-        setProducts(filtered.slice(0, 4))
+        const allProducts = data || []
+        const currentProduct = allProducts.find(p => p._id === currentId)
+        
+        if (!currentProduct) {
+          // Fallback seguro: devolver 5 recientes
+          setProducts(allProducts.filter(p => p._id !== currentId).slice(0, 5))
+          return
+        }
+
+        // Algoritmo de similitud
+        const scored = allProducts
+          .filter(p => p._id !== currentId)
+          .map(p => {
+            let score = 0;
+            // 1. Mismo fabricante (Prioridad Máxima)
+            if (p.brand?.title && p.brand.title === currentProduct.brand?.title) score += 50;
+            
+            // 2. Coincidencias olfativas y perceptivas (Vibe, Familia OLF, Clima)
+            const commonTags = p.tags?.filter(t => currentProduct.tags?.includes(t)) || [];
+            score += commonTags.length * 10;
+            
+            // 3. Afinidad de jerarquía de precio (Si están a <= USD 30 de diferencia)
+            if (p.price?.basePrice && currentProduct.price?.basePrice) {
+               if (Math.abs(p.price.basePrice - currentProduct.price.basePrice) <= 30) score += 5;
+            }
+
+            return { product: p, score };
+          });
+
+        // Ordenar por score decreciente, desempatar por isFeatured (novedades)
+        const sorted = scored.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return (b.product.isFeatured ? 1 : 0) - (a.product.isFeatured ? 1 : 0);
+        });
+
+        // Garantizar 5 resultados
+        setProducts(sorted.map(s => s.product).slice(0, 5))
       })
   }, [currentId])
 
@@ -29,8 +63,11 @@ export default function SuggestedProducts({ currentId }: SuggestedProductsProps)
   return (
     <section style={{
       background: 'var(--color-dark)',
-      padding: 'clamp(4rem, 8vw, 6rem) clamp(1.5rem, 4vw, 3rem)'
+      padding: 'clamp(4rem, 8vw, 6rem) clamp(1.5rem, 4vw, 3rem)',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      <ArabicPatternOverlay opacity={0.04} color="light" />
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         {/* HEADER */}
@@ -53,12 +90,18 @@ export default function SuggestedProducts({ currentId }: SuggestedProductsProps)
 
         {/* GRID */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '1px',
-          background: 'rgba(234,230,223,0.06)'
+          display: 'flex',
+          flexWrap: 'nowrap',
+          justifyContent: 'flex-start',
+          gap: 'clamp(1rem, 2vw, 1.5rem)',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x mandatory',
+          paddingBottom: '2rem',
+          scrollbarWidth: 'none', // Para Firefox
         }}
-        className="suggested-grid"
+        className="suggested-grid hide-scrollbar"
         >
           {products.map((product, i) => (
             <motion.div
@@ -67,79 +110,15 @@ export default function SuggestedProducts({ currentId }: SuggestedProductsProps)
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08, duration: 0.5 }}
+              style={{
+                flex: '0 0 auto',
+                width: 'calc(85vw - 2rem)',
+                maxWidth: 'calc((100% - (clamp(1rem, 2vw, 1.5rem) * 4)) / 5)', // 5 items exactos en Desktop
+                minWidth: '240px',
+                scrollSnapAlign: 'start',
+              }}
             >
-              <Link
-                href={`/perfume/${product.slug}`}
-                style={{ textDecoration: 'none', display: 'block' }}
-              >
-                {/* IMAGEN */}
-                <div style={{
-                  aspectRatio: '1/1',
-                  background: 'rgba(234,230,223,0.06)',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  {product.imageUrl ? (
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      fill
-                      style={{
-                        objectFit: 'contain',
-                        padding: '12%',
-                        transition: 'transform 500ms ease'
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      width: '100%', height: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <img
-                        src="/logoC.png"
-                        alt="Banū"
-                        style={{ width: '40%', opacity: 0.1 }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* INFO */}
-                <div style={{ padding: '1rem 0.25rem 1.5rem' }}>
-                  <p style={{
-                    fontFamily: 'var(--font-dm-sans)',
-                    fontSize: '0.6rem',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    color: 'var(--color-gold)',
-                    opacity: 0.6,
-                    marginBottom: '0.25rem'
-                  }}>
-                    {product.brand?.title}
-                  </p>
-                  <p style={{
-                    fontFamily: 'var(--font-cormorant)',
-                    fontSize: '1rem',
-                    fontWeight: 400,
-                    color: 'var(--color-cream)',
-                    marginBottom: '0.375rem'
-                  }}>
-                    {product.name}
-                  </p>
-                  <p style={{
-                    fontFamily: 'var(--font-dm-sans)',
-                    fontSize: '0.8rem',
-                    color: 'var(--color-cream)',
-                    opacity: 0.5
-                  }}>
-                    {product.price?.basePrice
-                      ? `USD ${product.price.basePrice.toLocaleString()}`
-                      : 'Consultar'}
-                  </p>
-                </div>
-              </Link>
+              <ProductCard product={product} theme="dark" index={i} context="default" />
             </motion.div>
           ))}
         </div>

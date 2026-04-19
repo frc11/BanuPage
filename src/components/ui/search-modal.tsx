@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { sanityFetch } from '@/lib/sanity'
 import { ALL_PRODUCTS_QUERY } from '@/lib/queries'
 import { PerfumeData } from '@/types/sanity'
+import { X } from 'lucide-react'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -19,6 +20,30 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [allProducts, setAllProducts] = useState<PerfumeData[]>([])
   const [loading, setLoading] = useState(false)
+  const scrollYRef = useRef(0)
+
+  // Lock scroll
+  useEffect(() => {
+    if (isOpen) {
+      scrollYRef.current = window.scrollY;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior });
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
 
   // Fetch productos una sola vez al abrir
   useEffect(() => {
@@ -99,21 +124,28 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             }}
           />
 
-          {/* PANEL */}
+          {/* DRAWER */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] as const }}
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.42, ease: [0.25, 0.1, 0.25, 1] as const }}
             style={{
               position: 'fixed',
-              top: '10vh',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 'min(600px, 90vw)',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: 'var(--nav-drawer-width, 480px)',
+              maxWidth: '100vw',
+              height: '100%',
               background: 'var(--color-cream)',
               zIndex: 'calc(var(--z-modal) + 1)',
-              padding: '2rem'
+              padding: '1.5rem',
+              paddingTop: '2.5rem',
+              overflowY: 'auto',
+              boxShadow: '4px 0 24px rgba(44,24,16,0.12)',
+              display: 'flex',
+              flexDirection: 'column'
             }}
           >
             {/* HEADER */}
@@ -136,18 +168,22 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <button
                 onClick={onClose}
                 style={{
-                  width: 32, height: 32,
-                  background: 'var(--color-dark)',
-                  color: 'var(--color-cream)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
+                  width: '44px',
+                  height: '44px',
+                  border: '1px solid rgba(44,24,16,0.15)',
+                  color: 'var(--color-dark)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  transition: 'border-color 200ms ease, opacity 200ms ease',
+                  opacity: 0.7,
                 }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.7'; }}
               >
-                ×
+                <X size={18} strokeWidth={1.5} />
               </button>
             </div>
 

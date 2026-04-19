@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Check } from "lucide-react";
 import {
   useSelectionStore,
   useIsInSelection,
@@ -16,7 +15,7 @@ import { Truck, Shield, MessageCircle, ChevronDown } from "lucide-react";
 
 // ─── WhatsApp Icon ────────────────────────────────────────────────────────────
 
-function WhatsAppIcon({ size = 16 }: { size?: number }) {
+function WhatsAppIcon({ size = 18 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -34,6 +33,101 @@ function WhatsAppIcon({ size = 16 }: { size?: number }) {
   );
 }
 
+// ─── Divider ─────────────────────────────────────────────────────────────────
+
+function Divider({ spacing = '2rem' }: { spacing?: string }) {
+  return (
+    <div style={{
+      width: '100%',
+      height: '1px',
+      background: 'var(--color-dark)',
+      opacity: 0.08,
+      margin: `${spacing} 0`,
+    }} />
+  );
+}
+
+// ─── Animated Accordion ───────────────────────────────────────────────────────
+
+interface AccordionItem {
+  id: string;
+  title: string;
+  content: string;
+}
+
+function AccordionPanel({ items }: { items: AccordionItem[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  return (
+    <div>
+      {items.map((acc) => {
+        const isOpen = openId === acc.id;
+        return (
+          <div key={acc.id} style={{ borderTop: '1px solid rgba(44,24,16,0.08)' }}>
+            <button
+              onClick={() => setOpenId(isOpen ? null : acc.id)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem 0',
+                cursor: 'pointer',
+                background: 'transparent',
+                border: 'none',
+              }}
+              aria-expanded={isOpen}
+            >
+              <span style={{
+                fontFamily: 'var(--font-dm-sans)',
+                fontSize: '0.72rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: 'var(--color-dark)',
+                opacity: 0.7,
+              }}>
+                {acc.title}
+              </span>
+              <motion.div
+                animate={{ rotate: isOpen ? 180 : 0 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                <ChevronDown size={14} style={{ opacity: 0.4 }} />
+              </motion.div>
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  key="content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <p style={{
+                    paddingBottom: '1.25rem',
+                    fontFamily: 'var(--font-dm-sans)',
+                    fontSize: '0.82rem',
+                    lineHeight: 1.75,
+                    color: 'var(--color-dark)',
+                    opacity: 0.6,
+                    maxWidth: '90%',
+                  }}>
+                    {acc.content}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+      <div style={{ borderTop: '1px solid rgba(44,24,16,0.08)' }} />
+    </div>
+  );
+}
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface ProductInfoProps {
@@ -45,22 +139,11 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
   const addItem = useSelectionStore((s) => s.addItem);
   const removeItem = useSelectionStore((s) => s.removeItem);
-
-  // Suscripción granular — solo re-renderiza cuando ESTE producto cambia de estado
   const isInSelection = useIsInSelection(product._id);
 
-  // Precio formateado defensivo
-  const activePrice = product.price.isOnSale && product.price.discountPrice ? product.price.discountPrice : product.price.basePrice;
-  const formattedPrice =
-    typeof activePrice === "number" && activePrice > 0
-      ? `USD ${activePrice.toLocaleString("es-AR")}`
-      : null;
-
-  // WhatsApp — consulta directa de este producto individual
   const waMessage = `Hola Banū, quiero consultar sobre ${product.brand?.title ? `${product.brand.title} ` : ""}${product.name}`;
   const waUrl = `https://wa.me/5493814665503?text=${encodeURIComponent(waMessage)}`;
 
-  // Toggle: agrega si no está, quita si ya está
   const handleSelectionToggle = () => {
     if (isInSelection) {
       removeItem(product._id);
@@ -69,49 +152,72 @@ export function ProductInfo({ product }: ProductInfoProps) {
         id: product._id,
         name: product.name,
         brand: product.brand?.title ?? "",
-        // El store requiere number — 0 dispara "Consultar" en el mensaje WA
-        price: typeof product.price.basePrice === "number" && product.price.basePrice > 0 ? (product.price.isOnSale && product.price.discountPrice ? product.price.discountPrice : product.price.basePrice) : 0,
+        price:
+          typeof product.price.basePrice === "number" && product.price.basePrice > 0
+            ? product.price.isOnSale && product.price.discountPrice
+              ? product.price.discountPrice
+              : product.price.basePrice
+            : 0,
         slug: product.slug,
-        // URL ya resuelta por GROQ — no se necesita urlFor()
         imageUrl: product.imageUrl ?? "",
       });
     }
   };
 
   return (
-    <div className="flex flex-col">
-      {/* Badge MODO BESTIA, EDICIÓN LIMITADA, etc */}
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+      {/* ── BADGE ── */}
       <ProductBadge badge={product.badge} theme="light" />
 
-      {/* Marca */}
+      {/* ── MARCA ── */}
       {product.brand?.title && (
-        <span className="font-sans text-[0.65rem] tracking-[0.3em] uppercase text-[var(--color-gold)] mb-3 mt-1">
+        <span style={{
+          fontFamily: 'var(--font-dm-sans)',
+          fontSize: '0.7rem',
+          letterSpacing: '0.32em',
+          textTransform: 'uppercase',
+          color: 'var(--color-gold)',
+          marginBottom: '0.75rem',
+          marginTop: product.badge ? '0.5rem' : '0',
+          opacity: 0.85,
+        }}>
           {product.brand.title}
         </span>
       )}
 
-      {/* Nombre */}
-      <h1 className="font-serif text-[clamp(2rem,5vw,3.5rem)] font-normal text-[var(--color-dark)] leading-[1.1] mb-2">
+      {/* ── NOMBRE ── */}
+      <h1 style={{
+        fontFamily: 'var(--font-cormorant)',
+        fontSize: 'clamp(2.2rem, 4.5vw, 3.8rem)',
+        fontWeight: 300,
+        color: 'var(--color-dark)',
+        lineHeight: 1.08,
+        marginBottom: '1rem',
+        letterSpacing: '-0.01em',
+      }}>
         {product.name}
       </h1>
 
-      {/* 4. inspiredBy */}
+      {/* ── INSPIRADO EN ── */}
       {product.inspiredBy && (
         <p style={{
           fontFamily: 'var(--font-dm-sans)',
-          fontSize: '0.72rem',
+          fontSize: '0.78rem',
           fontStyle: 'italic',
           color: 'var(--color-gold)',
-          opacity: 0.7,
-          marginBottom: '1.5rem'
+          opacity: 0.75,
+          marginBottom: '0',
         }}>
           Inspirado en {product.inspiredBy}
         </p>
       )}
 
-      {/* Precio */}
-      <div className="mb-8 pb-8 border-b border-[var(--color-dark)]/10">
-        <ProductPrice 
+      <Divider spacing="1.75rem" />
+
+      {/* ── PRECIO ── */}
+      <div style={{ marginBottom: '2rem' }}>
+        <ProductPrice
           basePrice={product.price?.basePrice}
           discountPrice={product.price?.discountPrice}
           isOnSale={product.price?.isOnSale}
@@ -120,19 +226,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
         />
       </div>
 
-      {/* 7. BOTÓN AGREGAR A MI SELECCIÓN */}
+      {/* ── CTA: AGREGAR ── */}
       <motion.button
         onClick={handleSelectionToggle}
-        whileHover={{ opacity: 0.85 }}
+        whileHover={{ opacity: 0.88 }}
         style={{
           width: '100%',
           background: isInSelection ? 'var(--color-gold)' : 'var(--color-dark)',
           color: 'var(--color-cream)',
           border: 'none',
-          padding: '1rem 2rem',
+          padding: '1.15rem 2rem',
           fontFamily: 'var(--font-dm-sans)',
-          fontSize: '0.72rem',
-          letterSpacing: '0.2em',
+          fontSize: '0.75rem',
+          letterSpacing: '0.22em',
           textTransform: 'uppercase',
           cursor: 'pointer',
           display: 'flex',
@@ -140,35 +246,23 @@ export function ProductInfo({ product }: ProductInfoProps) {
           justifyContent: 'center',
           gap: '0.625rem',
           transition: 'background 300ms ease',
-          marginBottom: '0.75rem'
+          marginBottom: '0.875rem',
         }}
       >
         <AnimatePresence mode="wait">
           {isInSelection ? (
-            <motion.span
-              key="added"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.span key="added" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }} transition={{ duration: 0.18 }}>
               ✓ En tu selección
             </motion.span>
           ) : (
-            <motion.span
-              key="add"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.span key="add" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }} transition={{ duration: 0.18 }}>
               + Agregar a mi selección
             </motion.span>
           )}
         </AnimatePresence>
       </motion.button>
 
-      {/* 8. BOTÓN CONSULTAR POR WHATSAPP */}
+      {/* ── CTA: WHATSAPP ── */}
       <a
         href={waUrl}
         target="_blank"
@@ -177,107 +271,137 @@ export function ProductInfo({ product }: ProductInfoProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: '0.625rem',
           width: '100%',
-          padding: '1rem 2rem',
-          border: '1px solid var(--color-dark)',
+          padding: '1.15rem 2rem',
+          border: '1px solid rgba(44,24,16,0.25)',
           color: 'var(--color-dark)',
           background: 'transparent',
           fontFamily: 'var(--font-dm-sans)',
-          fontSize: '0.72rem',
-          letterSpacing: '0.2em',
+          fontSize: '0.75rem',
+          letterSpacing: '0.22em',
           textTransform: 'uppercase',
           textDecoration: 'none',
           cursor: 'pointer',
-          transition: 'background 300ms ease',
-          marginBottom: '2rem'
+          transition: 'background 300ms ease, border-color 300ms ease',
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(44,24,16,0.05)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'transparent'
-        }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(44,24,16,0.05)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
       >
         <WhatsAppIcon size={16} />
-        <span style={{ marginLeft: '0.625rem' }}>Consultar por WhatsApp</span>
+        Consultar por WhatsApp
       </a>
 
-      {/* 9. Links de Servicio */}
-      <div className="flex flex-col gap-4 pt-4">
-        <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
-          <Truck size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
-          <span>Envío prioritario a todo el país</span>
-        </div>
-        <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
-          <Shield size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
-          <span>Garantía de autenticidad BANŪ</span>
-        </div>
-        <div className="flex items-center gap-3 text-[0.65rem] tracking-[0.1em] uppercase opacity-70">
-          <MessageCircle size={14} strokeWidth={1.5} className="text-[var(--color-gold)]" />
-          <span>Asesoramiento olfativo personalizado</span>
-        </div>
+      <Divider spacing="2rem" />
+
+      {/* ── GARANTÍAS ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {[
+          { icon: <Truck size={15} strokeWidth={1.5} />, text: 'Envío prioritario a todo el país' },
+          { icon: <Shield size={15} strokeWidth={1.5} />, text: 'Garantía de autenticidad BANŪ' },
+          { icon: <MessageCircle size={15} strokeWidth={1.5} />, text: 'Asesoramiento olfativo personalizado' },
+        ].map(({ icon, text }) => (
+          <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+            <span style={{ color: 'var(--color-gold)', opacity: 0.8, flexShrink: 0 }}>{icon}</span>
+            <span style={{
+              fontFamily: 'var(--font-dm-sans)',
+              fontSize: '0.72rem',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--color-dark)',
+              opacity: 0.6,
+            }}>
+              {text}
+            </span>
+          </div>
+        ))}
       </div>
 
-      <div className="mt-8 mb-8 border-b border-[var(--color-dark)]/10" />
+      <Divider spacing="2.5rem" />
 
-      {/* 11. Descripción (Notas Olfativas) */}
+      {/* ── NOTAS OLFATIVAS ── */}
       <div>
-        <p className="font-sans text-[0.6rem] tracking-[0.2em] uppercase opacity-40 mb-4">Notas Olfativas</p>
-        <div className="grid grid-cols-1 gap-6">
-          <div className="flex flex-col gap-1">
-            <span className="font-sans text-[0.65rem] tracking-[0.1em] uppercase opacity-60">Salida</span>
-            <p className="font-serif text-[1rem] italic opacity-90">{product.notes.top}</p>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="font-sans text-[0.65rem] tracking-[0.1em] uppercase opacity-60">Corazón</span>
-            <p className="font-serif text-[1rem] italic opacity-90">{product.notes.heart}</p>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="font-sans text-[0.65rem] tracking-[0.1em] uppercase opacity-60">Fondo</span>
-            <p className="font-serif text-[1rem] italic opacity-90">{product.notes.base}</p>
-          </div>
+        <p style={{
+          fontFamily: 'var(--font-dm-sans)',
+          fontSize: '0.62rem',
+          letterSpacing: '0.28em',
+          textTransform: 'uppercase',
+          color: 'var(--color-dark)',
+          opacity: 0.38,
+          marginBottom: '1.75rem',
+        }}>
+          Notas Olfativas
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
+          {[
+            { label: 'Salida', notes: product.notes.top },
+            { label: 'Corazón', notes: product.notes.heart },
+            { label: 'Fondo', notes: product.notes.base },
+          ].map(({ label, notes }) => (
+            <div key={label}>
+              <span style={{
+                display: 'block',
+                fontFamily: 'var(--font-dm-sans)',
+                fontSize: '0.6rem',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--color-dark)',
+                opacity: 0.45,
+                marginBottom: '0.5rem',
+              }}>
+                {label}
+              </span>
+              <p style={{
+                fontFamily: 'var(--font-cormorant)',
+                fontSize: '1rem',
+                fontStyle: 'italic',
+                color: 'var(--color-dark)',
+                lineHeight: 1.45,
+                opacity: 0.85,
+              }}>
+                {notes}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* 9. PerformanceBars */}
-      <div className="mt-10 pt-8 border-t border-[var(--color-dark)]/10">
-        <PerformanceBars 
-          longevity={product.performance.longevity} 
-          projection={product.performance.projection} 
-          theme="light"
-        />
-      </div>
+      <Divider spacing="2.5rem" />
 
-      {/* 10. OccasionTags */}
+      {/* ── PERFORMANCE BARS ── */}
+      <PerformanceBars
+        longevity={product.performance.longevity}
+        projection={product.performance.projection}
+        theme="light"
+      />
+
+      {/* ── OCCASION TAGS ── */}
       {product.tags && product.tags.length > 0 && (
-        <div className="mt-4">
+        <div style={{ marginTop: '2rem' }}>
           <OccasionTags tags={product.tags} theme="light" />
         </div>
       )}
 
-      {/* 11. Acordeones (Detalles, Envío) */}
-      <div className="mt-10 flex flex-col">
-        {[
-          { id: 'details', title: 'Detalles del Producto', content: `Este perfume ha sido seleccionado por la curaduría de la bóveda BANŪ. Inspirado en ${product.inspiredBy || 'las fragancias más exclusivas'}, ofrece una experiencia sensorial única.` },
-          { id: 'shipping', title: 'Política de Envío', content: 'Realizamos envíos a todo el territorio nacional mediante logística privada. El tiempo estimado de entrega es de 3 a 5 días hábiles.' }
-        ].map((acc) => (
-          <div key={acc.id} className="border-t border-[var(--color-dark)]/10">
-            <details className="group">
-              <summary className="flex items-center justify-between py-5 cursor-pointer list-none focus:outline-none">
-                <span className="font-sans text-[0.7rem] tracking-[0.2em] uppercase opacity-80">{acc.title}</span>
-                <ChevronDown size={14} className="opacity-40 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="pb-5 font-sans text-[0.8rem] leading-relaxed opacity-60 max-w-[90%]">
-                {acc.content}
-              </div>
-            </details>
-          </div>
-        ))}
-        <div className="border-t border-[var(--color-dark)]/10 w-full" />
-      </div>
+      <Divider spacing="2rem" />
 
-      {/* Hint contextual */}
-      <p className="mt-10 font-sans text-[0.6rem] tracking-[0.12em] text-[var(--color-dark)] opacity-35 text-center leading-relaxed">
+      {/* ── ACORDEONES ── */}
+      <AccordionPanel items={[
+        { id: 'details', title: 'Detalles del Producto', content: `Este perfume ha sido seleccionado por la curaduría de la bóveda BANŪ. Inspirado en ${product.inspiredBy || 'las fragancias más exclusivas'}, ofrece una experiencia sensorial única.` },
+        { id: 'shipping', title: 'Política de Envío', content: 'Realizamos envíos a todo el territorio nacional mediante logística privada. El tiempo estimado de entrega es de 3 a 5 días hábiles.' },
+      ]} />
+
+      {/* ── HINT CONTEXTUAL ── */}
+      <p style={{
+        marginTop: '1.5rem',
+        fontFamily: 'var(--font-dm-sans)',
+        fontSize: '0.62rem',
+        letterSpacing: '0.12em',
+        color: 'var(--color-dark)',
+        opacity: 0.3,
+        textAlign: 'center',
+        lineHeight: 1.7,
+      }}>
         {isInSelection
           ? "Click para quitar · Consultá tu selección completa desde el ícono de la bolsa"
           : "Agregá varios perfumes y consultá todo de una vez por WhatsApp"}

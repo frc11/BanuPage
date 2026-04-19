@@ -131,10 +131,10 @@ export default function LoadingScreen() {
           style={{ zIndex: 'var(--z-preloader)' as unknown as number }}
         >
           {/* 1. LOGO SVG ANIMADO */}
-          <div className="w-[100px] md:w-[140px] flex items-center justify-center relative">
+          <div className="w-[320px] md:w-[440px] flex items-center justify-center relative">
             <svg
-              viewBox="0 0 1536 1024"
-              className="w-full h-auto overflow-visible"
+              viewBox="418 360 682 192"
+              className="w-full h-auto"
               xmlns="http://www.w3.org/2000/svg"
             >
               {LOGO_PATHS.map((d, index) => (
@@ -165,9 +165,9 @@ export default function LoadingScreen() {
           {/* 2. LÍNEA DORADA */}
           <motion.div
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 48, opacity: 1 }}
+            animate={{ width: 144, opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.4, ease: [0.25, 0.1, 0.25, 1] }}
-            className="h-[1px] bg-[var(--color-gold)] mt-7"
+            className="h-[1px] bg-[var(--color-gold)] mt-5"
           />
 
           {/* 3. TAGLINE */}
@@ -175,7 +175,7 @@ export default function LoadingScreen() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 0.45, y: 0 }}
             transition={{ duration: 0.5, delay: 1.7 }}
-            className="mt-4 font-sans text-[0.58rem] tracking-[0.4em] text-[var(--color-cream)] uppercase"
+            className="mt-5 font-sans text-[1.75rem] tracking-[0.4em] text-[var(--color-cream)] uppercase"
           >
             Perfumes Árabes
           </motion.div>

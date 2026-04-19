@@ -10,8 +10,9 @@ import {
 import { mapSanityPerfume } from "@/lib/mappers";
 import { ProductInfo } from "@/src/components/pdp/product-info";
 import { BanuLogo } from "@/components/ui/BanuLogo";
-import RevealImage from "@/src/components/ui/reveal-image";
 import SuggestedProducts from "@/src/components/pdp/suggested-products-pdp";
+import { ArabicPatternOverlay } from "@/components/ui/ArabicPattern";
+import ProductGallery from "@/src/components/pdp/product-gallery";
 
 // ─── Static Params (ISR + prerender en build) ─────────────────────────────────
 
@@ -71,10 +72,8 @@ export default async function ProductPage({
     params: { slug },
   });
 
-  // Hard 404 — no existe el producto o fue eliminado
   if (!rawProduct) notFound();
 
-  // Normalización via Mapper (Arquitectura Defensiva)
   const product = mapSanityPerfume(rawProduct as never);
 
   const jsonLd = {
@@ -100,55 +99,48 @@ export default async function ProductPage({
   };
 
   return (
-    <div style={{ background: 'var(--color-cream)' }}>
+    <div style={{ background: 'var(--color-cream)', position: 'relative' }} data-navtheme="light">
+      <ArabicPatternOverlay opacity={0.04} color="dark" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      
-      {/* LAYOUT SPLIT — dos columnas */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '58% 42%',
-        minHeight: '100vh',
-        paddingTop: 'var(--navbar-height)'
-      }}
-      className="pdp-grid"
-      >
 
-        {/* COLUMNA IZQUIERDA — GALERÍA */}
+      {/* LAYOUT SPLIT — dos columnas */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '50% 50%',
+          minHeight: '100vh',
+          alignItems: 'start',
+        }}
+        className="pdp-grid"
+      >
+        {/* COLUMNA IZQUIERDA — sticky, imagen full */}
         <div style={{
           position: 'sticky',
           top: 'var(--navbar-height)',
           height: 'calc(100vh - var(--navbar-height))',
           background: 'var(--color-cream-dark)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          marginTop: 'var(--navbar-height)',
         }}>
           {product.imageUrl ? (
-            <RevealImage
-              src={product.imageUrl}
-              alt={product.name}
-              fill
-              priority
-              style={{ objectFit: 'contain', padding: '8%' }}
+            <ProductGallery 
+              images={[product.imageUrl, ...(product.gallery || [])].filter(Boolean) as string[]} 
+              productName={product.name} 
             />
           ) : (
-            // FALLBACK elegante cuando no hay imagen
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="w-[80px] opacity-20">
-                <BanuLogo theme="light" />
-              </div>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', opacity: 0.2 }}>
+              <BanuLogo theme="light" />
+            </div>
           )}
         </div>
 
-        {/* COLUMNA DERECHA — INFO */}
+        {/* COLUMNA DERECHA — scrolleable */}
         <div style={{
           padding: 'clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 4rem)',
-          overflowY: 'auto'
+          paddingTop: 'calc(var(--navbar-height) + clamp(3rem, 5vw, 5rem))',
         }}>
           <ProductInfo product={product} />
         </div>

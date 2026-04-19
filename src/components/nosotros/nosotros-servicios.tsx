@@ -1,6 +1,7 @@
 'use client'
 import { motion } from 'framer-motion'
 import RevealText from '@/src/components/ui/reveal-text'
+import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern'
 
 const SERVICIOS = [
   {
@@ -30,10 +31,13 @@ export default function NosotrosServicios() {
     <section
       id="servicios"
       style={{
-        background: 'var(--color-cream)',
-        padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem)'
+        background: 'var(--color-dark)',
+        padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem)',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
+      <ArabicPatternOverlay opacity={0.035} color="light" />
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
           <motion.p
@@ -59,7 +63,8 @@ export default function NosotrosServicios() {
               fontFamily: 'var(--font-cormorant)',
               fontSize: 'clamp(2rem, 4vw, 3.5rem)',
               fontWeight: 300,
-              color: 'var(--color-dark)'
+              color: 'var(--color-cream)',
+              textAlign: 'center',
             }}
           />
         </div>
@@ -68,7 +73,7 @@ export default function NosotrosServicios() {
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '1px',
-          background: 'rgba(44,24,16,0.06)'
+          background: 'rgba(234,230,223,0.06)'
         }}
         className="servicios-grid"
         >
@@ -80,7 +85,7 @@ export default function NosotrosServicios() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
               style={{
-                background: 'var(--color-cream)',
+                background: 'var(--color-dark)',
                 padding: 'clamp(2rem, 4vw, 3rem) 1.5rem',
                 textAlign: 'center'
               }}
@@ -99,7 +104,7 @@ export default function NosotrosServicios() {
                 fontSize: '0.65rem',
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
-                color: 'var(--color-dark)',
+                color: 'var(--color-cream)',
                 fontWeight: 500,
                 marginBottom: '0.875rem'
               }}>
@@ -109,7 +114,7 @@ export default function NosotrosServicios() {
               <p style={{
                 fontFamily: 'var(--font-dm-sans)',
                 fontSize: '0.8rem',
-                color: 'var(--color-dark)',
+                color: 'var(--color-cream)',
                 opacity: 0.55,
                 lineHeight: 1.75
               }}>

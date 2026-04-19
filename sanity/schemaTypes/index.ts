@@ -4,7 +4,6 @@ import hero from './hero';
 
 import faqItem from './faqItem';
 import review from './review';
-import trustItem from './trustItem';
 
 export const schemaTypes = [
   brand,
@@ -12,5 +11,4 @@ export const schemaTypes = [
   hero,
   faqItem,
   review,
-  trustItem,
 ];

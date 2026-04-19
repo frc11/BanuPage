@@ -3,8 +3,10 @@ import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern';
 
 interface SectionDividerProps {
   variant?: 'pattern' | 'ornament' | 'line';
-  from?: 'cream' | 'dark';  // color de la sección anterior
-  to?: 'cream' | 'dark';    // color de la sección siguiente
+  from?: 'cream' | 'dark';  // color de la seccion anterior
+  to?: 'cream' | 'dark';    // color de la seccion siguiente
+  ornamentPaddingTop?: string;
+  ornamentPaddingBottom?: string;
 }
 
 const COLORS = {
@@ -12,10 +14,12 @@ const COLORS = {
   dark: '#2C1810'
 };
 
-export const SectionDivider = ({ 
-  variant = 'pattern', 
-  from = 'cream', 
-  to = 'dark' 
+export const SectionDivider = ({
+  variant = 'pattern',
+  from = 'cream',
+  to = 'dark',
+  ornamentPaddingTop = '1rem',
+  ornamentPaddingBottom = '1rem'
 }: SectionDividerProps) => {
 
   if (variant === 'pattern') {
@@ -23,17 +27,17 @@ export const SectionDivider = ({
     const toColor = COLORS[to];
 
     return (
-      <div 
-        style={{ 
-          height: '80px', 
-          width: '100%', 
-          background: toColor, 
-          position: 'relative', 
-          overflow: 'hidden' 
+      <div
+        style={{
+          height: from === to ? '0' : '80px',
+          width: '100%',
+          background: toColor,
+          position: 'relative',
+          overflow: 'hidden'
         }}
       >
-        <ArabicPatternOverlay opacity={0.06} color={to === 'dark' ? 'light' : 'dark'} />
-        <div 
+        {from !== to && <ArabicPatternOverlay opacity={0.06} color={to === 'dark' ? 'light' : 'dark'} />}
+        <div
           style={{
             position: 'absolute',
             inset: 0,
@@ -46,11 +50,12 @@ export const SectionDivider = ({
 
   if (variant === 'ornament') {
     return (
-      <div 
-        style={{ 
-          height: 'auto', 
-          width: '100%', 
-          padding: '2rem 0', 
+      <div
+        style={{
+          height: 'auto',
+          width: '100%',
+          paddingTop: ornamentPaddingTop,
+          paddingBottom: ornamentPaddingBottom,
           background: 'transparent',
           display: 'flex',
           alignItems: 'center',
@@ -60,14 +65,14 @@ export const SectionDivider = ({
       >
         <div style={{ width: '40px', height: '1px', background: '#8B7355', opacity: 0.4 }} />
         <svg width="8" height="8" viewBox="0 0 8 8">
-          <rect 
-            x="1" 
-            y="1" 
-            width="6" 
-            height="6" 
-            transform="rotate(45 4 4)" 
-            fill="none" 
-            stroke="#8B7355" 
+          <rect
+            x="1"
+            y="1"
+            width="6"
+            height="6"
+            transform="rotate(45 4 4)"
+            fill="none"
+            stroke="#8B7355"
             strokeWidth="1"
           />
         </svg>
@@ -79,12 +84,12 @@ export const SectionDivider = ({
   if (variant === 'line') {
     const isDarkBg = from === 'dark' || to === 'dark';
     return (
-      <div 
-        style={{ 
-          height: '1px', 
-          width: '100%', 
-          background: isDarkBg ? 'rgba(234,230,223,0.1)' : 'rgba(44,24,16,0.08)' 
-        }} 
+      <div
+        style={{
+          height: '1px',
+          width: '100%',
+          background: isDarkBg ? 'rgba(234,230,223,0.1)' : 'rgba(44,24,16,0.08)'
+        }}
       />
     );
   }

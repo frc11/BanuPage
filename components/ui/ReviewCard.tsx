@@ -8,47 +8,87 @@ export interface ReviewCardProps {
   variants?: Variants;
 }
 
+const MAX_CHARS = 220;
+
+function truncate(str: string, max: number): string {
+  if (str.length <= max) return str;
+  return str.slice(0, max).trimEnd() + '…';
+}
+
 export function ReviewCard({ author, rating, text, variants }: ReviewCardProps) {
   const safeRating = Math.min(Math.max(Math.floor(rating), 0), 5);
+  const displayText = truncate(text, MAX_CHARS);
 
   return (
-    <motion.div 
+    <motion.div
       variants={variants}
-      className="flex flex-col items-center justify-start text-center bg-[#FFFFFF] rounded-none p-10 border border-[rgba(139,115,85,0.1)] shadow-none h-full w-full"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        textAlign: 'center',
+        background: '#FFFFFF',
+        border: '1px solid rgba(139,115,85,0.1)',
+        width: '100%',
+        height: '100%',
+        paddingTop: '2.8rem',
+        paddingBottom: '2.8rem',
+        paddingLeft: '2.5rem',
+        paddingRight: '2.5rem',
+        boxSizing: 'border-box',
+      }}
     >
-      {/* Estrellas llenas - Explícitamente centradas */}
-      <div className="flex flex-row items-center justify-center gap-[3px] mb-6 w-full">
+      {/* Estrellas arriba */}
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <svg 
-            key={i} 
-            width="12" 
-            height="12" 
-            viewBox="0 0 24 24" 
-            fill={i < safeRating ? "var(--color-gold)" : "transparent"} 
+          <svg
+            key={i}
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill={i < safeRating ? 'var(--color-gold)' : 'transparent'}
             stroke="var(--color-gold)"
             strokeWidth="2"
             strokeLinejoin="round"
-            className={i >= safeRating ? "opacity-30" : ""}
+            style={{ opacity: i >= safeRating ? 0.3 : 1 }}
           >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         ))}
       </div>
-      
-      {/* Texto Tipográfico - Explícitamente centrado */}
-      <p className="font-serif text-[1.1rem] italic text-[var(--color-dark)] leading-[1.8] mb-8 flex-grow max-w-[95%] text-center">
-        "{text}"
+
+      {/* Texto del testimonio — centrado verticalmente */}
+      <p
+        style={{
+          fontFamily: 'var(--font-serif, Georgia, serif)',
+          fontSize: 'clamp(1.15rem, 2vw, 1.4rem)',
+          fontStyle: 'italic',
+          color: 'var(--color-dark)',
+          lineHeight: '1.8',
+          maxWidth: '90%',
+          textAlign: 'center',
+          margin: '0',
+        }}
+      >
+        &ldquo;{displayText}&rdquo;
       </p>
 
-      {/* Separador estricto - Centrado */}
-      <div className="w-12 h-[1px] bg-[var(--color-gold)] opacity-30 mb-6" />
-
-      {/* Nombre - Explícitamente centrado */}
-      <span className="font-sans font-medium text-[0.7rem] uppercase tracking-[0.3em] text-[var(--color-gold)] text-center w-full">
+      {/* Nombre del autor */}
+      <span
+        style={{
+          fontFamily: 'var(--font-sans, sans-serif)',
+          fontWeight: 500,
+          fontSize: '0.78rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.14em',
+          color: 'var(--color-gold)',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
         {author}
       </span>
     </motion.div>
   );
 }
-
-

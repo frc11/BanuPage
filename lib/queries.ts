@@ -34,13 +34,6 @@ export const FEATURED_PRODUCTS_QUERY = `*[_type == "perfume"] | order(_createdAt
   "brand": brand->{ "title": name, "logoUrl": logo.asset->url }
 }`;
 
-export const TRUST_ITEMS_QUERY = `*[_type == "trustItem"] | order(_createdAt asc) { 
-  _id, 
-  title, 
-  description, 
-  iconName 
-}`;
-
 export const FAQ_ITEMS_QUERY = `*[_type == "faqItem"] | order(_createdAt asc) { 
   _id, 
   question, 

@@ -7,6 +7,7 @@ interface ProductBadgeProps {
 }
 
 export default function ProductBadge({ badge, theme = 'dark' }: ProductBadgeProps) {
+  void theme;
   if (!badge) return null;
   
   const isBeast = badge.toUpperCase() === 'MODO BESTIA';
@@ -23,8 +24,11 @@ export default function ProductBadge({ badge, theme = 'dark' }: ProductBadgeProp
         letterSpacing: '0.3em',
         textTransform: 'uppercase',
         color: color, 
-        display: 'block',
-        marginBottom: '0.375rem',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0.25rem 0.75rem',
+        marginBottom: '1rem',
         pointerEvents: 'none'
       }}
     >

@@ -3,9 +3,7 @@ import { cn } from '@/lib/utils';
 
 export interface MarqueeProps {
   children: React.ReactNode;
-  /** Configura de forma ágil la duración final de la animación */
   speed?: 'slow' | 'normal' | 'fast' | number;
-  /** Flujo de movimiento */
   direction?: 'left' | 'right';
   className?: string;
   align?: 'start' | 'center' | 'end';
@@ -18,8 +16,6 @@ export function Marquee({
   className,
   align = 'center'
 }: MarqueeProps) {
-  
-  // Relaciones de tiempo para la estética "Silent Luxury"
   const speedMap: Record<string, string> = {
     slow: '60s',
     normal: '35s',
@@ -34,43 +30,43 @@ export function Marquee({
     end: 'items-end'
   }[align];
 
+  const gapValue = 'var(--marquee-gap, var(--spacing-card))';
+  const paddingValue = 'var(--marquee-padding, var(--spacing-sm))';
+
+  const trackStyle = {
+    animationDuration: durationValue,
+    gap: gapValue,
+    paddingLeft: paddingValue,
+    paddingRight: `calc(${paddingValue} + ${gapValue})`,
+  } as React.CSSProperties;
+
   return (
-    <div 
+    <div
       className={cn(
-        "group overflow-hidden flex flex-row w-full select-none", 
-        // Opción: máscara de fade a los costados para más lujo.
+        "group overflow-hidden flex flex-row w-full select-none",
         "[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]",
         className
       )}
     >
-      {/* 
-        Container A 
-        Usar group-hover nos permite detener ambas partes de forma síncrona
-      */}
-      <div 
+      <div
         className={cn(
-          "w-max flex flex-row shrink-0 justify-start gap-16 px-8",
+          "w-max flex flex-row shrink-0 justify-start",
           alignClass,
           directionClass,
           "group-hover:[animation-play-state:paused]"
         )}
-        style={{ animationDuration: durationValue }}
+        style={trackStyle}
       >
         {children}
       </div>
-
-      {/* 
-        Container B (Duplicación Infinita) 
-        aria-hidden="true" previene doble lectura en screen readers.
-      */}
-      <div 
+      <div
         className={cn(
-          "w-max flex flex-row shrink-0 justify-start gap-16 px-8",
+          "w-max flex flex-row shrink-0 justify-start",
           alignClass,
           directionClass,
           "group-hover:[animation-play-state:paused]"
         )}
-        style={{ animationDuration: durationValue }}
+        style={trackStyle}
         aria-hidden="true"
       >
         {children}

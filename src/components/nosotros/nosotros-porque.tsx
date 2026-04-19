@@ -24,17 +24,12 @@ const RAZONES = [
 export default function NosotrosPorQue() {
   return (
     <section style={{
-      background: 'var(--color-dark)',
+      background: 'var(--color-cream)',
       padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem)',
       position: 'relative',
       overflow: 'hidden'
     }}>
-      <div style={{
-        position: 'absolute', inset: 0,
-        opacity: 0.03, pointerEvents: 'none'
-      }}>
-        <ArabicPatternOverlay color="light" />
-      </div>
+      <ArabicPatternOverlay opacity={0.035} color="dark" />
 
       <div style={{
         maxWidth: '1100px',
@@ -65,9 +60,10 @@ export default function NosotrosPorQue() {
               fontFamily: 'var(--font-cormorant)',
               fontSize: 'clamp(2rem, 4vw, 3.5rem)',
               fontWeight: 300,
-              color: 'var(--color-cream)',
+              color: 'var(--color-dark)',
               maxWidth: '600px',
-              margin: '0 auto'
+              margin: '0 auto',
+              textAlign: 'center',
             }}
           />
         </div>
@@ -111,7 +107,7 @@ export default function NosotrosPorQue() {
                 fontFamily: 'var(--font-cormorant)',
                 fontSize: '1.25rem',
                 fontWeight: 400,
-                color: 'var(--color-cream)',
+                color: 'var(--color-dark)',
                 marginBottom: '0.875rem',
                 lineHeight: 1.3
               }}>
@@ -121,7 +117,7 @@ export default function NosotrosPorQue() {
               <p style={{
                 fontFamily: 'var(--font-dm-sans)',
                 fontSize: '0.8rem',
-                color: 'var(--color-cream)',
+                color: 'var(--color-dark)',
                 opacity: 0.55,
                 lineHeight: 1.8
               }}>

@@ -15,13 +15,13 @@ export default function NosotrosPage() {
   return (
     <>
       <NosotrosHero />
-      <SectionDivider variant="ornament" />
-      <NosotrosHistoria />
       <SectionDivider variant="pattern" from="cream" to="dark" />
-      <NosotrosPorQue />
+      <NosotrosHistoria />
       <SectionDivider variant="pattern" from="dark" to="cream" />
+      <NosotrosPorQue />
+      <SectionDivider variant="pattern" from="cream" to="dark" />
       <NosotrosServicios />
-      <SectionDivider variant="ornament" />
+      <SectionDivider variant="pattern" from="dark" to="cream" />
       <NosotrosContacto />
     </>
   )

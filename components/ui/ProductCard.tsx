@@ -22,6 +22,7 @@ export interface ProductCardProps {
   showTags?: boolean;
   priority?: boolean;
   context?: 'default' | 'catalog';
+  fluidWidth?: boolean;
 }
 
 export function ProductCard({
@@ -33,9 +34,11 @@ export function ProductCard({
   showTags = true,
   priority = false,
   context = 'default',
+  fluidWidth = false,
 }: ProductCardProps) {
   const [hovered, setHovered] = useState(false);
   const addItem = useSelectionStore((s) => s.addItem);
+  const removeItem = useSelectionStore((s) => s.removeItem);
   const isInSelection = useIsInSelection(product._id);
 
   const isCatalogCard = context === 'catalog';
@@ -50,14 +53,18 @@ export function ProductCard({
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem({
-      id: product._id,
-      name: product.name,
-      brand: product.brand?.title ?? '',
-      price: activePrice,
-      slug: product.slug,
-      imageUrl: product.imageUrl ?? '',
-    });
+    if (isInSelection) {
+      removeItem(product._id);
+    } else {
+      addItem({
+        id: product._id,
+        name: product.name,
+        brand: product.brand?.title ?? '',
+        price: activePrice,
+        slug: product.slug,
+        imageUrl: product.imageUrl ?? '',
+      });
+    }
   };
 
   const waMessage = `Hola Ban\u016b, me interesa ${product.name}`;
@@ -66,12 +73,25 @@ export function ProductCard({
   const discountPct = product.price?.isOnSale && product.price?.discountPrice && product.price?.basePrice
     ? Math.round((1 - product.price.discountPrice / product.price.basePrice) * 100)
     : null;
+  const enforceAlignedRows = !isCatalogCard && !showButton;
+  const inspiredClampStyle: React.CSSProperties | undefined = enforceAlignedRows
+    ? {
+      display: '-webkit-box',
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: 'vertical',
+      overflow: 'hidden',
+      minHeight: 'calc(0.72rem * 1.35 * 2)',
+    }
+    : undefined;
 
   return (
     <div
-      className={`group flex flex-col bg-transparent border-none shadow-none overflow-hidden relative ${
-        isCatalogCard ? 'w-full min-w-0' : 'w-[220px] md:w-[280px] shrink-0'
-      }`}
+      className={`group relative flex flex-col gap-1 bg-transparent shadow-none overflow-hidden p-[var(--spacing-card)] !rounded-[4px] ${isCatalogCard
+          ? 'w-full min-w-0'
+          : fluidWidth
+            ? 'w-full min-w-0 max-w-[320px]'
+            : 'w-[220px] md:w-[280px] shrink-0'
+        }`}
     >
       <Link
         href={pdpHref}
@@ -97,7 +117,7 @@ export function ProductCard({
                 fill
                 unoptimized
                 priority={priority}
-                className="object-cover p-0"
+                className="object-cover"
                 style={{
                   opacity: hovered ? 1 : 0,
                   transition: 'opacity 500ms ease-out',
@@ -114,7 +134,7 @@ export function ProductCard({
               unoptimized
               priority={priority}
               delay={index * 0.08}
-              className="object-contain p-6"
+              className="object-cover"
               style={{
                 opacity: product.hoverImageUrl && hovered ? 0 : 1,
                 transform: hovered ? 'scale(1.04)' : 'scale(1)',
@@ -124,6 +144,35 @@ export function ProductCard({
               }}
             />
 
+            {/* Badge encima de la imagen con glow */}
+            {product.badge && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '0.75rem',
+                  left: '0.75rem',
+                  zIndex: 4,
+                  pointerEvents: 'none',
+                  background: 'linear-gradient(135deg, rgba(139,115,85,0.95) 0%, rgba(180,148,100,0.98) 100%)',
+                  padding: '0.3rem 0.65rem',
+                  boxShadow: '0 0 18px 4px rgba(180,148,100,0.45), 0 2px 8px rgba(0,0,0,0.25)',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: 'var(--font-dm-sans)',
+                    fontSize: '0.55rem',
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: '#fff',
+                    fontWeight: 600,
+                  }}
+                >
+                  {product.badge}
+                </span>
+              </div>
+            )}
+
             {product.price?.isOnSale && product.price?.discountPrice && discountPct !== null && (
               <div
                 style={{
@@ -131,7 +180,7 @@ export function ProductCard({
                   top: '0.625rem',
                   left: '0.625rem',
                   background: 'var(--color-dark)',
-                  padding: '0.2rem 0.5rem',
+                  padding: '0.25rem 0.5rem',
                   zIndex: 3,
                   pointerEvents: 'none',
                 }}
@@ -149,6 +198,58 @@ export function ProductCard({
                 </span>
               </div>
             )}
+
+            {/* Hover CTA — desliza desde abajo al hacer hover en la imagen */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 5,
+                transform: hovered ? 'translateY(0)' : 'translateY(100%)',
+                transition: 'transform 380ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+              }}
+            >
+              <button
+                onClick={handleAdd}
+                aria-label={isInSelection ? `Quitar ${product.name}` : `Agregar ${product.name} a mi selección`}
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1rem',
+                  background: isInSelection
+                    ? 'linear-gradient(90deg, rgba(139,115,85,0.97) 0%, rgba(160,130,90,0.97) 100%)'
+                    : 'linear-gradient(90deg, rgba(44,24,16,0.96) 0%, rgba(60,35,22,0.96) 100%)',
+                  border: 'none',
+                  color: 'var(--color-cream)',
+                  fontFamily: 'var(--font-dm-sans)',
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  backdropFilter: 'blur(4px)',
+                  transition: 'background 280ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLButtonElement;
+                  el.style.background = isInSelection
+                    ? 'linear-gradient(90deg, rgba(160,130,90,1) 0%, rgba(180,148,100,1) 100%)'
+                    : 'linear-gradient(90deg, rgba(139,115,85,0.98) 0%, rgba(160,134,95,0.98) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLButtonElement;
+                  el.style.background = isInSelection
+                    ? 'linear-gradient(90deg, rgba(139,115,85,0.97) 0%, rgba(160,130,90,0.97) 100%)'
+                    : 'linear-gradient(90deg, rgba(44,24,16,0.96) 0%, rgba(60,35,22,0.96) 100%)';
+                }}
+              >
+                {isInSelection ? '✓ En mi selección' : '+ Agregar a mi selección'}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="relative w-full aspect-[3/4] bg-[var(--color-cream-dark)] flex items-center justify-center overflow-hidden">
@@ -160,35 +261,39 @@ export function ProductCard({
         )}
       </Link>
 
-      <div className={`flex flex-col pt-4 flex-grow ${isCatalogCard ? 'px-1 md:px-1.5' : ''}`}>
-        {product.badge && (
-          <div className="mb-1">
-            <ProductBadge badge={product.badge} theme={theme} />
-          </div>
-        )}
+      <div
+        className={`flex flex-col flex-grow ${enforceAlignedRows ? 'gap-1' : 'gap-1'} ${isCatalogCard ? 'px-1 md:px-1.5' : ''}`}
+      >
+        {/* Badge placeholder para alineación — NUNCA muestra el badge duplicado */}
+        <div className={enforceAlignedRows ? 'min-h-[2.1rem] flex items-start' : 'hidden'}>
+          {enforceAlignedRows && !product.badge && <span aria-hidden="true" className="block h-[2.1rem]" />}
+        </div>
 
-        <div className="mb-2 mt-1">
+        <div className={`flex flex-col ${enforceAlignedRows ? 'min-h-[3.35rem]' : ''}`} style={{ marginTop: '0.2rem' }}>
           {product.brand?.title && (
-            <span className="block font-sans text-[0.65rem] tracking-[0.15em] uppercase opacity-45 text-[var(--color-gold)]">
+            <span className="mb-0.5 block font-sans text-[0.8rem] tracking-widest uppercase opacity-45 text-[var(--color-gold)]">
               {product.brand.title}
             </span>
           )}
           {product.inspiredBy && (
-            <span className={`block font-serif italic text-[0.72rem] opacity-60 mt-[0.15rem] ${textColor}`}>
+            <span className={`block font-serif italic text-[0.92rem] leading-[1.35] opacity-60 ${textColor}`} style={inspiredClampStyle}>
               Inspirado en: {product.inspiredBy}
             </span>
           )}
         </div>
 
-        <Link href={pdpHref} className="hover:opacity-70 transition-opacity duration-200 block mb-[0.65rem]">
+        <Link
+          href={pdpHref}
+          className={`mt-1 block hover:opacity-70 transition-opacity duration-200 ${enforceAlignedRows ? 'min-h-[3rem]' : 'mb-0.5'}`}
+        >
           <RevealText
             as="h4"
             text={product.name}
-            className={`font-serif text-[1.1rem] font-normal leading-[1.2] ${textColor}`}
+            className={`font-serif text-[1.45rem] font-normal leading-[1.2] ${textColor}`}
           />
         </Link>
 
-        <div className="mb-3">
+        <div className={`mt-2 pt-2 ${enforceAlignedRows ? 'min-h-[2.3rem]' : ''}`}>
           {isCatalogCard ? (
             product.price?.isOnSale && product.price?.discountPrice ? (
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -240,7 +345,7 @@ export function ProductCard({
         </div>
 
         {showPerformance && product.performance && (
-          <div className="mt-4">
+          <div className="mt-[var(--spacing-sm)]">
             <PerformanceBars
               longevity={product.performance.longevity}
               projection={product.performance.projection}
@@ -250,128 +355,14 @@ export function ProductCard({
         )}
 
         {showTags && product.tags && product.tags.length > 0 && (
-          <div className="mt-2 scale-75 origin-left overflow-hidden">
+          <div className="mt-[var(--spacing-xs)] scale-75 origin-left overflow-hidden">
             <OccasionTags tags={product.tags} theme={theme} />
           </div>
         )}
 
         <div className="flex-grow" />
 
-        {showButton && (
-          isCatalogCard ? (
-            <div className="mt-auto">
-              <button
-                id={`add-selection-${product._id}`}
-                onClick={handleAdd}
-                aria-label={
-                  isInSelection
-                    ? `Quitar ${product.name} de mi selecci\u00f3n`
-                    : `Agregar ${product.name} a mi selecci\u00f3n`
-                }
-                style={{
-                  width: '100%',
-                  background: isInSelection ? 'var(--color-gold)' : 'var(--color-dark)',
-                  color: 'var(--color-cream)',
-                  border: 'none',
-                  padding: '0.75rem 1rem',
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontSize: '0.6rem',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'background 300ms ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.4rem',
-                  marginTop: '0.75rem',
-                }}
-              >
-                {isInSelection ? '\u2713 En mi selecci\u00f3n' : '+ Seleccionar'}
-              </button>
 
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.4rem',
-                  border: '1px solid rgba(44,24,16,0.2)',
-                  padding: '0.65rem 1rem',
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontSize: '0.6rem',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-dark)',
-                  textDecoration: 'none',
-                  marginTop: '0.5rem',
-                  transition: 'border-color 200ms ease',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7a8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8a8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                </svg>
-                Consultar
-              </a>
-            </div>
-          ) : (
-            <div className="mt-auto flex flex-col gap-2">
-              <button
-                id={`add-selection-${product._id}`}
-                onClick={handleAdd}
-                aria-label={
-                  isInSelection
-                    ? `Quitar ${product.name} de mi selecci\u00f3n`
-                    : `Agregar ${product.name} a mi selecci\u00f3n`
-                }
-                className={`
-                  w-full flex items-center justify-center gap-2
-                  border py-[0.75rem] px-4 bg-transparent
-                  font-sans text-[0.65rem] tracking-[0.2em] uppercase
-                  transition-all duration-300 ease focus:outline-none
-                  ${isInSelection
-                    ? 'border-[var(--color-gold)] text-[var(--color-gold)]'
-                    : `${borderColor} ${textColor} hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:!text-[var(--color-cream)]`
-                  }
-                `}
-              >
-                {isInSelection ? 'EN MI SELECCI\u00d3N' : 'SELECCIONAR'}
-              </button>
-
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`
-                  w-full flex items-center justify-center gap-2
-                  border py-[0.75rem] px-4 bg-transparent
-                  font-sans text-[0.65rem] tracking-[0.2em] uppercase
-                  transition-all duration-300 ease
-                  ${borderColor} ${textColor} hover:bg-[var(--color-dark)] hover:text-[var(--color-text-light)]
-                `}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-                </svg>
-                CONSULTAR
-              </a>
-            </div>
-          )
-        )}
       </div>
     </div>
   );

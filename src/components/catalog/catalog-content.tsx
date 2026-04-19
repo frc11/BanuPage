@@ -6,6 +6,9 @@ import { PerfumeData, BrandData } from '@/types/sanity'
 import { ProductCard } from '@/components/ui/ProductCard'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import CatalogFilters from './catalog-filters'
+import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern'
+
+const PAGE_SIZE = 8
 
 interface CatalogContentProps {
   products: PerfumeData[]
@@ -52,6 +55,14 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
     }
   })
 
+  const [page, setPage] = useState(1)
+
+  // Resetear página al cambiar filtros
+  const handleFiltersChange = (f: FiltersState) => {
+    setFilters(f)
+    setPage(1)
+  }
+
   const filtered = useMemo(() => {
     const base = products.filter((p) => {
       if (filters.searchQuery) {
@@ -96,8 +107,12 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
     return base
   }, [products, filters])
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
   return (
-    <div style={{ background: 'var(--color-cream)', minHeight: '60vh' }}>
+    <div style={{ background: 'var(--color-cream)', minHeight: '60vh', position: 'relative' }}>
+      <ArabicPatternOverlay opacity={0.04} color="dark" />
       <div
         style={{
           position: 'sticky',
@@ -161,9 +176,9 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              opacity: 0.7
             }}
             id="catalog-filter-btn"
+            className="opacity-50 hover:opacity-100 transition-opacity duration-300"
           >
             Filtros
             {(filters.selectedBrands.length + filters.selectedTags.length) > 0 && (
@@ -189,29 +204,107 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
           theme="light"
         />
       ) : (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="catalog-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '0',
-            background: 'transparent',
-            padding: 'clamp(1rem, 4vw, 2rem)',
-            paddingTop: '2rem'
-          }}
-        >
-          {filtered.map((product, i) => (
-            <motion.div key={product._id} variants={cardVariants}>
-              <ProductCard product={product} theme="light" index={i} context="catalog" />
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <motion.div
+            key={page}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="catalog-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 'clamp(0.75rem, 2vw, 1.5rem)',
+              background: 'transparent',
+              padding: 'clamp(1rem, 4vw, 2.5rem)',
+              paddingTop: '2rem'
+            }}
+          >
+            {paginated.map((product, i) => (
+              <motion.div key={product._id} variants={cardVariants}>
+                <ProductCard product={product} theme="light" index={i} context="catalog" priority={i < 8} />
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* PAGINACIÓN */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2rem',
+              padding: '2.5rem clamp(1rem, 4vw, 2.5rem)',
+              borderTop: '1px solid rgba(44,24,16,0.08)',
+            }}>
+              {/* Flecha izquierda */}
+              <button
+                onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                disabled={page === 1}
+                aria-label="Página anterior"
+                style={{
+                  width: 40, height: 40,
+                  border: '1px solid',
+                  borderColor: page === 1 ? 'rgba(44,24,16,0.15)' : 'rgba(44,24,16,0.4)',
+                  background: 'transparent',
+                  color: page === 1 ? 'rgba(44,24,16,0.25)' : 'var(--color-dark)',
+                  cursor: page === 1 ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 250ms ease',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {/* Indicador de página */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                  <button
+                    key={n}
+                    onClick={() => { setPage(n); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    style={{
+                      width: n === page ? 28 : 8,
+                      height: 8,
+                      background: n === page ? 'var(--color-gold)' : 'rgba(44,24,16,0.2)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 350ms ease',
+                      flexShrink: 0,
+                    }}
+                    aria-label={`Ir a página ${n}`}
+                    aria-current={n === page ? 'page' : undefined}
+                  />
+                ))}
+              </div>
+
+              {/* Flecha derecha */}
+              <button
+                onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                disabled={page === totalPages}
+                aria-label="Página siguiente"
+                style={{
+                  width: 40, height: 40,
+                  border: '1px solid',
+                  borderColor: page === totalPages ? 'rgba(44,24,16,0.15)' : 'rgba(44,24,16,0.4)',
+                  background: 'transparent',
+                  color: page === totalPages ? 'rgba(44,24,16,0.25)' : 'var(--color-dark)',
+                  cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 250ms ease',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </>
       )}
 
-      <CatalogFilters brands={brands} filters={filters} onFiltersChange={setFilters} filteredCount={filtered.length} />
+      <CatalogFilters brands={brands} filters={filters} onFiltersChange={handleFiltersChange} filteredCount={filtered.length} />
     </div>
   )
 }

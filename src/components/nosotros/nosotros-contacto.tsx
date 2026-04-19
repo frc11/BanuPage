@@ -8,19 +8,14 @@ export default function NosotrosContacto() {
     <section
       id="contacto"
       style={{
-        background: 'var(--color-dark)',
+        background: 'var(--color-cream)',
         padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem)',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden'
       }}
     >
-      <div style={{
-        position: 'absolute', inset: 0,
-        opacity: 0.03, pointerEvents: 'none'
-      }}>
-        <ArabicPatternOverlay color="light" />
-      </div>
+      <ArabicPatternOverlay opacity={0.035} color="dark" />
 
       <div style={{ position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
         <motion.p
@@ -46,10 +41,12 @@ export default function NosotrosContacto() {
             fontFamily: 'var(--font-cormorant)',
             fontSize: 'clamp(2rem, 4vw, 3.5rem)',
             fontWeight: 300,
-            color: 'var(--color-cream)',
-            marginBottom: '1.5rem'
+            color: 'var(--color-dark)',
+            marginBottom: '1.5rem',
+            textAlign: 'center',
           }}
         />
+
 
         <motion.p
           initial={{ opacity: 0, y: 8 }}
@@ -59,7 +56,7 @@ export default function NosotrosContacto() {
           style={{
             fontFamily: 'var(--font-dm-sans)',
             fontSize: '0.875rem',
-            color: 'var(--color-cream)',
+            color: 'var(--color-dark)',
             lineHeight: 1.8,
             marginBottom: '3rem'
           }}
@@ -81,8 +78,8 @@ export default function NosotrosContacto() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.75rem',
-            background: 'var(--color-cream)',
-            color: 'var(--color-dark)',
+            background: 'var(--color-dark)',
+            color: 'var(--color-cream)',
             padding: '1rem 2.5rem',
             fontFamily: 'var(--font-dm-sans)',
             fontSize: '0.7rem',

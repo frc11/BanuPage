@@ -42,17 +42,17 @@ export interface PerfumeData {
   };
 }
 
+export interface FaqItemData {
+  _id: string;
+  question: string;
+  answer: string;
+}
+
 export interface TrustItemData {
   _id: string;
   title: string;
   description: string;
   iconName: string;
-}
-
-export interface FaqItemData {
-  _id: string;
-  question: string;
-  answer: string;
 }
 
 export interface ReviewData {

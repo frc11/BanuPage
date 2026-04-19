@@ -63,7 +63,10 @@ export default async function MarcasPage() {
             color: 'var(--color-cream)',
             letterSpacing: '0.04em',
             marginBottom: '1.25rem',
-            position: 'relative'
+            position: 'relative',
+            textAlign: 'center',
+            justifyContent: 'center',
+            width: '100%',
           }}
         />
 

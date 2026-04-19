@@ -6,9 +6,12 @@ import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern'
 export default function NosotrosHistoria() {
   return (
     <section style={{
-      background: 'var(--color-cream)',
-      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem)'
+      background: 'var(--color-dark)',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem)',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      <ArabicPatternOverlay opacity={0.035} color="light" />
       <div style={{
         maxWidth: '1100px',
         margin: '0 auto',
@@ -45,9 +48,10 @@ export default function NosotrosHistoria() {
               fontFamily: 'var(--font-cormorant)',
               fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
               fontWeight: 300,
-              color: 'var(--color-dark)',
+              color: 'var(--color-cream)',
               marginBottom: '2rem',
-              lineHeight: 1.25
+              lineHeight: 1.25,
+              textAlign: 'center',
             }}
           />
 
@@ -65,7 +69,7 @@ export default function NosotrosHistoria() {
               style={{
                 fontFamily: 'var(--font-dm-sans)',
                 fontSize: '0.875rem',
-                color: 'var(--color-dark)',
+                color: 'var(--color-cream)',
                 opacity: 0.7,
                 lineHeight: 1.85,
                 marginBottom: '1.25rem'
@@ -83,7 +87,7 @@ export default function NosotrosHistoria() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           style={{
-            background: 'var(--color-cream-dark)',
+            background: 'rgba(255,255,255,0.05)',
             aspectRatio: '3/4',
             display: 'flex',
             alignItems: 'center',
@@ -97,7 +101,7 @@ export default function NosotrosHistoria() {
             position: 'absolute', inset: 0,
             opacity: 0.06
           }}>
-            <ArabicPatternOverlay color="dark" />
+            <ArabicPatternOverlay color="light" />
           </div>
           <img
             src="/logoM.png"

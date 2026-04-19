@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 
 export interface BanuLogoProps {
-  theme?: 'dark' | 'light' | 'svg';
+  theme?: 'dark' | 'light' | 'svg' | 'gold-dark';
   className?: string;
   asLink?: boolean;
 }
@@ -13,6 +13,10 @@ export function BanuLogo({ theme = 'dark', className, asLink = true }: BanuLogoP
   let logoSrc = '/logoM.png';
   if (theme === 'light') logoSrc = '/logoC.png';
   if (theme === 'svg') logoSrc = '/logoSVG.svg';
+  if (theme === 'gold-dark') logoSrc = '/logoM.png';
+
+  // Filtro que convierte el PNG oscuro en un dorado muy oscuro y saturado
+  const goldDarkFilter = 'brightness(0) saturate(100%) invert(18%) sepia(60%) saturate(600%) hue-rotate(10deg) brightness(0.7)';
 
   const imageElement = (
     <Image
@@ -21,6 +25,7 @@ export function BanuLogo({ theme = 'dark', className, asLink = true }: BanuLogoP
       width={600}
       height={100}
       className={cn("w-auto h-[60px] md:h-[100px] object-contain", className)}
+      style={theme === 'gold-dark' ? { filter: goldDarkFilter } : undefined}
       priority
       unoptimized
     />

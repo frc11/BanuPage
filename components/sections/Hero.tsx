@@ -52,7 +52,7 @@ export function Hero({
   }, [currentIndex, activeVideos]);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[var(--color-dark)]">
+    <section className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[var(--color-dark)] py-[var(--spacing-section-y)]">
       <ArabicPatternOverlay opacity={0.07} color="light" className="z-0" />
 
       {activeVideos.length > 0 && (
@@ -90,58 +90,47 @@ export function Hero({
       />
 
       {showContent && (
-        <div className="relative z-20 flex flex-col items-center w-full max-w-4xl px-6 text-center">
-          {title && (
-            <RevealText
-              as="h1"
-              text={title}
-              className="font-serif text-[var(--color-cream)] font-light text-[clamp(3.5rem,10vw,8rem)] tracking-[0.1em] leading-[0.9] mb-8 whitespace-pre-line"
-              delay={0.3}
-            />
-          )}
+        <div className="relative z-20 flex h-full w-full flex-col px-[var(--spacing-section-x)] py-[var(--spacing-section-y)]">
+          <div className="mx-auto mt-auto flex w-full max-w-4xl flex-col items-center pb-[var(--spacing-xl)] text-center">
+            {title && (
+              <RevealText
+                as="h1"
+                text={title}
+                className="font-serif text-[var(--color-cream)] font-light text-[clamp(3.5rem,10vw,8rem)] tracking-[0.1em] leading-[0.9] mb-8 whitespace-pre-line"
+                delay={0.3}
+              />
+            )}
 
-          {subtitle && (
-            <RevealText
-              as="p"
-              text={subtitle}
-              className="font-sans text-[var(--color-cream)] text-[clamp(0.75rem,1.5vw,0.9rem)] tracking-[0.35em] uppercase opacity-70 mb-12 max-w-[80%] mx-auto"
-              delay={0.65}
-            />
-          )}
+            {subtitle && (
+              <RevealText
+                as="p"
+                text={subtitle}
+                className="font-sans text-[var(--color-cream)] text-[clamp(0.75rem,1.5vw,0.9rem)] tracking-[0.35em] uppercase opacity-70 mb-12 max-w-[80%] mx-auto"
+                delay={0.65}
+              />
+            )}
 
-          <motion.div
-            custom={1}
-            variants={copyVariants}
-            initial="hidden"
-            animate="visible"
-            className="flex justify-center"
-          >
-            <Link
-              href={ctaLink}
-              className="group relative inline-flex items-center justify-center border border-[var(--color-cream)]/30 text-[var(--color-cream)] bg-transparent px-14 py-4 font-sans text-[0.7rem] tracking-[0.3em] uppercase transition-all duration-500 hover:border-[var(--color-cream)]"
+            <motion.div
+              custom={1}
+              variants={copyVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex justify-center"
             >
-              <div className="absolute inset-0 bg-[var(--color-cream)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-              <span className="relative z-10 group-hover:text-[var(--color-dark)] transition-colors duration-300">
-                {ctaText}
-              </span>
-            </Link>
-          </motion.div>
+              <Link
+                href={ctaLink}
+                className="group relative inline-flex items-center justify-center border border-[var(--color-cream)]/30 text-[var(--color-cream)] bg-transparent px-14 py-4 font-sans text-[0.7rem] tracking-[0.3em] uppercase transition-all duration-500 hover:border-[var(--color-cream)]"
+              >
+                <div className="absolute inset-0 bg-[var(--color-cream)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                <span className="relative z-10 group-hover:text-[var(--color-dark)] transition-colors duration-300">
+                  {ctaText}
+                </span>
+              </Link>
+            </motion.div>
+          </div>
         </div>
       )}
 
-      {!showContent && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-          <Image
-            src="/logoSVG.svg"
-            alt=""
-            aria-hidden="true"
-            width={220}
-            height={220}
-            className="w-[clamp(110px,18vw,220px)] h-auto"
-            style={{ opacity: 0.15 }}
-          />
-        </div>
-      )}
 
       {showContent && (
         <motion.div

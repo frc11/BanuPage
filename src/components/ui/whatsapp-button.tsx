@@ -1,10 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function WhatsAppButton() {
   const [hovered, setHovered] = useState(false)
+  const pathname = usePathname()
+
+  if (pathname?.startsWith('/studio')) return null
 
   return (
     <div

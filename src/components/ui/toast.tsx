@@ -66,7 +66,7 @@ export default function ToastContainer() {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '5rem',
+      bottom: '7.5rem',
       right: '1.5rem',
       zIndex: 9500,
       display: 'flex',

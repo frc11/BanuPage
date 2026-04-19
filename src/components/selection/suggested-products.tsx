@@ -35,14 +35,28 @@ export function SuggestedProducts({ allFeatured }: SuggestedProductsProps) {
         <p
           style={{
             fontFamily: "var(--font-dm-sans), sans-serif",
-            fontSize: "0.65rem",
+            fontSize: "0.62rem",
             letterSpacing: "0.35em",
             textTransform: "uppercase",
             color: "var(--color-text-light)",
-            opacity: 0.5,
+            opacity: 0.45,
+            marginBottom: "0.9rem",
           }}
         >
           TAMBIÉN TE PUEDE INTERESAR
+        </p>
+        <p
+          style={{
+            fontFamily: "var(--font-cormorant), serif",
+            fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+            fontWeight: 300,
+            color: "var(--color-text-light)",
+            letterSpacing: "0.02em",
+            opacity: 0.85,
+            margin: 0,
+          }}
+        >
+          Explorá el Catálogo
         </p>
       </div>
 

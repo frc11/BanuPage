@@ -11,6 +11,7 @@ import { SuggestedProducts } from "@/src/components/selection/suggested-products
 import RevealText from "@/src/components/ui/reveal-text";
 import type { PerfumeData } from "@/types/sanity";
 import { EmptyState } from "@/src/components/ui/empty-state";
+import { ArabicPatternOverlay } from "@/components/ui/ArabicPattern";
 
 
 // ─── Filled State — layout 2 columnas ────────────────────────────────────────
@@ -90,12 +91,17 @@ export function SelectionPageContent({ allFeatured }: SelectionPageContentProps)
 
   return (
     <main
+      data-navtheme="light"
       style={{
         minHeight: "100vh",
         backgroundColor: "var(--color-cream)",
-        paddingTop: "86px", // Navbar (36px topbar + 50px nav)
+        paddingTop: "86px",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      <ArabicPatternOverlay opacity={0.04} color="dark" />
+
       {/* Guard: esperar hidratación del store para evitar mismatch con localStorage */}
       {mounted ? (
         <>
@@ -103,7 +109,7 @@ export function SelectionPageContent({ allFeatured }: SelectionPageContentProps)
             <EmptyState 
               title="Tu selección está vacía" 
               subtitle="Explorá nuestro catálogo y seleccioná los perfumes que despierten tu curiosidad."
-              action={{ label: "Ir al Catálogo", href: "/" }}
+              action={{ label: "Ir al Catálogo", href: "/catalogo" }}
             />
           ) : <FilledState count={count} />}
           {/* Sugerencias: visibles en ambos estados — descubrimiento y upsell */}

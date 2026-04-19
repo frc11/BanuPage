@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { BrandData } from '@/types/sanity'
 import { EmptyState } from '@/src/components/ui/empty-state'
+import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern'
 
 interface BrandsGridProps {
   brands: BrandData[]
@@ -143,8 +144,11 @@ export default function BrandsGrid({ brands }: BrandsGridProps) {
   return (
     <section style={{
       background: 'var(--color-cream)',
-      padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem)'
+      padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem)',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      <ArabicPatternOverlay opacity={0.04} color="dark" />
       <motion.div
         variants={containerVariants}
         initial="hidden"

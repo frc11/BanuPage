@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSelectionCount } from '@/src/store/selection-store';
 
 export interface NavigationDrawerProps {
@@ -11,10 +12,24 @@ export interface NavigationDrawerProps {
   onClose: () => void;
 }
 
+const linkVariants = {
+  hidden: { opacity: 0, x: -24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.45, delay: 0.1 + i * 0.07, ease: [0.25, 0.1, 0.25, 1] },
+  }),
+};
+
+const bottomVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.45 } },
+};
+
 export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
   const count = useSelectionCount();
+  const scrollYRef = useRef(0);
 
-  // En mobile ocupa 100vw
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -24,124 +39,326 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
 
   useEffect(() => {
     if (isOpen) {
+      scrollYRef.current = window.scrollY;
       document.body.style.overflow = 'hidden';
-      // En iOS el overflow: hidden no siempre funciona
       document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
       document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
       document.body.style.position = '';
+      document.body.style.top = '';
       document.body.style.width = '';
+      window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior });
     }
-    return () => { 
+    return () => {
+      // Solo limpiar estilos en unmount, sin scrollTo para evitar doble restauración
       document.body.style.overflow = '';
       document.body.style.position = '';
+      document.body.style.top = '';
       document.body.style.width = '';
     };
   }, [isOpen]);
 
   const primaryLinks = [
-    { label: 'Catálogo', href: '/catalogo' },
-    { label: 'Marcas', href: '/marcas' },
-    { label: 'Nosotros', href: '/nosotros' },
-    {
-      label: 'Mi Selección',
-      href: '/seleccion',
-      badge: count > 0 ? count : undefined,
-    },
+    { label: 'Catálogo', href: '/catalogo', sub: 'Explorá todas las fragancias' },
+    { label: 'Marcas', href: '/marcas', sub: 'Casas exclusivas del Medio Oriente' },
+    { label: 'Nosotros', href: '/nosotros', sub: 'Nuestra historia y valores' },
+    { label: 'Mi Selección', href: '/seleccion', sub: 'Tu lista de favoritos', badge: count > 0 ? count : undefined },
   ];
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 cursor-pointer"
-            style={{ backgroundColor: 'rgba(44, 24, 16, 0.4)', zIndex: 'var(--z-drawer-overlay)' }}
+            style={{ 
+              background: 'rgba(44, 24, 16, 0.65)', 
+              backdropFilter: 'blur(4px)',
+              zIndex: 'var(--z-drawer-overlay)' 
+            }}
             onClick={onClose}
             aria-hidden="true"
           />
 
+          {/* Drawer */}
           <motion.nav
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.42, ease: [0.25, 0.1, 0.25, 1] }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={{ left: 0.3, right: 0 }}
-            onDragEnd={(_, info) => {
-              if (info.offset.x < -80) onClose();
+            onDragEnd={(_, info) => { if (info.offset.x < -80) onClose(); }}
+            className="fixed top-0 left-0 bottom-0 w-full max-w-[480px] h-full shadow-2xl flex flex-col"
+            style={{
+              width: 'var(--nav-drawer-width, 100vw)',
+              zIndex: 'var(--z-drawer)',
+              background: 'var(--color-dark)',
             }}
-            className="fixed top-0 left-0 bottom-0 w-full max-w-[480px] h-full bg-[var(--color-cream)] shadow-2xl flex flex-col overflow-y-auto"
-            style={{ width: 'var(--nav-drawer-width, 100vw)', zIndex: 'var(--z-drawer)' }}
           >
-            {/* Close */}
-            <div className="flex justify-end items-center p-6 lg:p-8">
+            {/* Subtle pattern overlay */}
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              backgroundImage: 'radial-gradient(circle at 80% 20%, rgba(139,115,85,0.08) 0%, transparent 60%), radial-gradient(circle at 10% 90%, rgba(139,115,85,0.06) 0%, transparent 50%)',
+            }} />
+
+            {/* Close button */}
+            <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', zIndex: 10 }}>
               <button
                 onClick={onClose}
                 aria-label="Cerrar navegación"
-                className="w-[44px] h-[44px] bg-[var(--color-dark)] text-[var(--color-text-light)] flex items-center justify-center hover:opacity-80 transition-opacity duration-300 rounded-none focus:outline-none"
+                style={{
+                  width: '44px', height: '44px',
+                  border: '1px solid rgba(234,230,223,0.15)',
+                  color: 'var(--color-cream)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  transition: 'border-color 200ms ease, opacity 200ms ease',
+                  opacity: 0.7,
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.7'; }}
               >
-                <X size={24} strokeWidth={1.5} />
+                <X size={18} strokeWidth={1.5} />
               </button>
             </div>
 
-            {/* Links */}
-            <div className="flex-1 px-10 lg:px-16 pt-4 pb-16 flex flex-col justify-center">
-              <ul className="flex flex-col space-y-6">
-                {primaryLinks.map((item) => (
-                  <li key={item.label}>
+            {/* ── TOP: Logo ── */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              style={{
+                padding: '2.5rem 2.5rem 0',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Link href="/" onClick={onClose} aria-label="Inicio" style={{ display: 'inline-block' }}>
+                <motion.div
+                  whileHover={{ filter: 'drop-shadow(0 0 18px rgba(139,115,85,0.9)) drop-shadow(0 0 36px rgba(139,115,85,0.45))' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Image
+                    src="/logoC.png"
+                    alt="BANŪ"
+                    width={300}
+                    height={80}
+                    style={{ width: 'auto', height: '100px', opacity: 0.92 }}
+                    priority
+                    unoptimized
+                  />
+                </motion.div>
+              </Link>
+
+              {/* Thin gold divider */}
+              <div style={{
+                marginTop: '2rem',
+                height: '1px',
+                width: '100%',
+                background: 'linear-gradient(90deg, rgba(139,115,85,0) 0%, rgba(139,115,85,0.6) 50%, rgba(139,115,85,0) 100%)',
+              }} />
+            </motion.div>
+
+            {/* ── CENTER: Nav links ── */}
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '0 2.5rem',
+            }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {primaryLinks.map((item, i) => (
+                  <motion.li
+                    key={item.label}
+                    custom={i}
+                    variants={linkVariants}
+                    initial="hidden"
+                    animate="visible"
+                    style={{ marginBottom: i < primaryLinks.length - 1 ? '0.25rem' : 0 }}
+                  >
                     <Link
                       href={item.href}
                       onClick={onClose}
-                      className="nav-link items-center gap-3"
+                      style={{ display: 'block', padding: '0.875rem 0', textDecoration: 'none', borderBottom: '1px solid rgba(234,230,223,0.06)' }}
                     >
-                      <span className="font-serif text-[clamp(2rem,5vw,2.8rem)] font-normal text-[var(--color-dark)] leading-[1.4]">
-                        {item.label}
-                      </span>
-                      {item.badge !== undefined && (
-                        <motion.span
-                          key={item.badge}
-                          initial={{ scale: 0.6, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          className="font-sans text-[0.65rem] bg-[var(--color-gold)] text-[var(--color-cream)] px-2 py-0.5 font-medium tracking-wider mb-1 self-end"
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.2rem' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-cormorant)',
+                          fontSize: 'clamp(2rem, 5vw, 2.75rem)',
+                          fontWeight: 300,
+                          color: 'var(--color-cream)',
+                          lineHeight: 1.1,
+                          letterSpacing: '0.01em',
+                          transition: 'color 200ms ease',
+                        }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLSpanElement).style.color = 'var(--color-gold)'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLSpanElement).style.color = 'var(--color-cream)'; }}
                         >
-                          {item.badge}
-                        </motion.span>
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="w-full h-[1px] bg-[var(--color-dark)] opacity-15 my-[1.5rem]" />
-
-              <ul className="flex flex-col space-y-4">
-                {[
-                  { label: 'Servicios', href: '/nosotros#servicios' },
-                  { label: 'Contacto', href: 'https://wa.me/5493814665503' },
-                  { label: 'FAQ', href: '/#faq' }
-                ].map((item) => (
-                  <li key={item.label}>
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
-                      className="nav-link"
-                    >
-                      <span className="font-sans text-[0.8rem] text-[var(--color-dark)] opacity-60 underline underline-offset-4 decoration-1">
-                        {item.label}
+                          {item.label}
+                        </span>
+                        {item.badge !== undefined && (
+                          <motion.span
+                            key={item.badge}
+                            initial={{ scale: 0.6, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            style={{
+                              fontFamily: 'var(--font-dm-sans)',
+                              fontSize: '0.6rem',
+                              background: 'var(--color-gold)',
+                              color: 'var(--color-cream)',
+                              padding: '0.2rem 0.5rem',
+                              fontWeight: 600,
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            {item.badge}
+                          </motion.span>
+                        )}
+                      </div>
+                      <span style={{
+                        fontFamily: 'var(--font-dm-sans)',
+                        fontSize: '0.62rem',
+                        letterSpacing: '0.08em',
+                        color: 'var(--color-cream)',
+                        opacity: 0.35,
+                      }}>
+                        {item.sub}
                       </span>
                     </Link>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </div>
+
+            {/* ── BOTTOM: Info + socials ── */}
+            <motion.div
+              variants={bottomVariants}
+              initial="hidden"
+              animate="visible"
+              style={{
+                padding: '1.5rem 2.5rem 2.5rem',
+                borderTop: '1px solid rgba(234,230,223,0.08)',
+                position: 'relative',
+              }}
+            >
+              {/* Frase */}
+              <p style={{
+                fontFamily: 'var(--font-cormorant)',
+                fontSize: '0.85rem',
+                fontStyle: 'italic',
+                color: 'var(--color-gold)',
+                opacity: 0.7,
+                marginBottom: '1.25rem',
+                letterSpacing: '0.02em',
+              }}>
+                "El perfume es el arte que hace memoria de las cosas invisibles."
+              </p>
+
+              {/* Ubicación */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                  style={{ color: 'var(--color-gold)', opacity: 0.6, flexShrink: 0 }}>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+                <span style={{
+                  fontFamily: 'var(--font-dm-sans)',
+                  fontSize: '0.62rem',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-cream)',
+                  opacity: 0.45,
+                }}>
+                  Yerba Buena, Tucumán
+                </span>
+              </div>
+
+              {/* Socials + WhatsApp */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {/* WhatsApp */}
+                <a
+                  href="https://wa.me/5493814665503"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.45rem',
+                    color: 'var(--color-cream)', opacity: 0.55,
+                    textDecoration: 'none', transition: 'opacity 200ms ease',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.55'; }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+                  </svg>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                    WhatsApp
+                  </span>
+                </a>
+
+                <div style={{ width: '1px', height: '14px', background: 'rgba(234,230,223,0.15)' }} />
+
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com/banuscents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.45rem',
+                    color: 'var(--color-cream)', opacity: 0.55,
+                    textDecoration: 'none', transition: 'opacity 200ms ease',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.55'; }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                  </svg>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                    Instagram
+                  </span>
+                </a>
+
+                <div style={{ width: '1px', height: '14px', background: 'rgba(234,230,223,0.15)' }} />
+
+                {/* TikTok */}
+                <a
+                  href="https://tiktok.com/@banuscents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.45rem',
+                    color: 'var(--color-cream)', opacity: 0.55,
+                    textDecoration: 'none', transition: 'opacity 200ms ease',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.55'; }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.69a4.85 4.85 0 0 1-1.01-.0z"/>
+                  </svg>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                    TikTok
+                  </span>
+                </a>
+              </div>
+            </motion.div>
           </motion.nav>
         </>
       )}

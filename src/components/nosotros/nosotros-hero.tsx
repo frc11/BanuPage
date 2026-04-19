@@ -5,8 +5,8 @@ import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern'
 
 export default function NosotrosHero() {
   return (
-    <section style={{
-      background: 'var(--color-dark)',
+    <section data-navtheme="light" style={{
+      background: 'var(--color-cream)',
       paddingTop: 'calc(var(--navbar-height) + 6rem)',
       paddingBottom: '6rem',
       paddingLeft: '2rem',
@@ -15,12 +15,7 @@ export default function NosotrosHero() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      <div style={{
-        position: 'absolute', inset: 0,
-        opacity: 0.03, pointerEvents: 'none'
-      }}>
-        <ArabicPatternOverlay color="light" />
-      </div>
+      <ArabicPatternOverlay opacity={0.035} color="dark" />
 
       <motion.p
         initial={{ opacity: 0 }}
@@ -46,12 +41,13 @@ export default function NosotrosHero() {
           fontFamily: 'var(--font-cormorant)',
           fontSize: 'clamp(2.5rem, 6vw, 5rem)',
           fontWeight: 300,
-          color: 'var(--color-cream)',
+          color: 'var(--color-dark)',
           letterSpacing: '0.03em',
           maxWidth: '800px',
           margin: '0 auto 2rem',
           lineHeight: 1.2,
-          position: 'relative'
+          position: 'relative',
+          textAlign: 'center',
         }}
       />
 
@@ -62,7 +58,7 @@ export default function NosotrosHero() {
         style={{
           fontFamily: 'var(--font-dm-sans)',
           fontSize: '0.875rem',
-          color: 'var(--color-cream)',
+          color: 'var(--color-dark)',
           maxWidth: '480px',
           margin: '0 auto',
           lineHeight: 1.8,

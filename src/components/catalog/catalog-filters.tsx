@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
 import { BrandData } from '@/types/sanity'
 
 const TAGS = ['Calor','Frío','Diario','Noche','Cita','Modo Bestia','Sport','Elegante']
@@ -112,17 +113,26 @@ export default function CatalogFilters({
               }}>
                 Filtros {activeCount > 0 && `(${activeCount})`}
               </p>
-              <button onClick={() => setOpen(false)} style={{
-                width: 32, height: 32,
-                background: 'var(--color-dark)',
-                color: 'var(--color-cream)',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>×</button>
+              <button
+                onClick={() => setOpen(false)}
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  border: '1px solid rgba(44,24,16,0.15)',
+                  color: 'var(--color-dark)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  transition: 'border-color 200ms ease, opacity 200ms ease',
+                  opacity: 0.7,
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.7'; }}
+              >
+                <X size={18} strokeWidth={1.5} />
+              </button>
             </div>
 
             {/* MARCAS */}
@@ -248,32 +258,12 @@ export default function CatalogFilters({
               </span>
             </label>
 
-            {/* FOOTER DEL PANEL */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-              borderTop: '1px solid rgba(44,24,16,0.1)',
-              paddingTop: '1.5rem'
-            }}>
-              <button
-                onClick={() => setOpen(false)}
-                style={{
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontSize: '0.7rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  background: 'var(--color-dark)',
-                  color: 'var(--color-cream)',
-                  border: 'none',
-                  padding: '1rem',
-                  cursor: 'pointer'
-                }}
-              >
-                Aplicar ({filteredCount ?? 0} resultados)
-              </button>
-
-              {activeCount > 0 && (
+            {/* FOOTER — solo si hay filtros activos */}
+            {activeCount > 0 && (
+              <div style={{
+                borderTop: '1px solid rgba(44,24,16,0.1)',
+                paddingTop: '1.5rem'
+              }}>
                 <button
                   onClick={clearAll}
                   style={{
@@ -285,14 +275,14 @@ export default function CatalogFilters({
                     color: 'var(--color-dark)',
                     border: 'none',
                     cursor: 'pointer',
-                    opacity: 0.45,
+                    opacity: 0.5,
                     textDecoration: 'underline'
                   }}
                 >
-                  Limpiar filtros
+                  Limpiar filtros ({activeCount})
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         </>
       )}

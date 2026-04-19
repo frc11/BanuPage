@@ -21,7 +21,8 @@ export default function RevealImage({
   src, alt, width, height, fill, priority, className, delay = 0, unoptimized, style
 }: RevealImageProps) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-80px' })
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const isInView = priority ? true : inView
 
   return (
     <motion.div
@@ -53,8 +54,8 @@ export default function RevealImage({
           fill={fill}
           priority={priority}
           unoptimized={unoptimized}
-          className={!fill ? className : undefined}
-          style={style || { objectFit: 'cover' }}
+          className={className}
+          style={{ objectFit: 'cover', objectPosition: 'center', ...style }}
         />
       </motion.div>
     </motion.div>
