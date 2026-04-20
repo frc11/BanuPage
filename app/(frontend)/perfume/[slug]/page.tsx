@@ -111,7 +111,7 @@ export default async function ProductPage({
         style={{
           display: 'grid',
           gridTemplateColumns: '50% 50%',
-          minHeight: '100vh',
+          minHeight: 'var(--app-vh)',
           alignItems: 'start',
         }}
         className="pdp-grid"
@@ -120,7 +120,7 @@ export default async function ProductPage({
         <div style={{
           position: 'sticky',
           top: 'var(--navbar-height)',
-          height: 'calc(100vh - var(--navbar-height))',
+          height: 'calc(var(--app-vh) - var(--navbar-height))',
           background: 'var(--color-cream-dark)',
           overflow: 'hidden',
           marginTop: 'var(--navbar-height)',
@@ -138,7 +138,9 @@ export default async function ProductPage({
         </div>
 
         {/* COLUMNA DERECHA — scrolleable */}
-        <div style={{
+        <div
+          className="pdp-info-column"
+          style={{
           padding: 'clamp(3rem, 5vw, 5rem) clamp(2rem, 4vw, 4rem)',
           paddingTop: 'calc(var(--navbar-height) + clamp(3rem, 5vw, 5rem))',
         }}>

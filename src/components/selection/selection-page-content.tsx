@@ -94,7 +94,7 @@ export function SelectionPageContent({ allFeatured }: SelectionPageContentProps)
     <main
       data-navtheme="light"
       style={{
-        minHeight: "100vh",
+        minHeight: "var(--app-vh)",
         backgroundColor: "var(--color-cream)",
         paddingTop: "86px",
         position: "relative",

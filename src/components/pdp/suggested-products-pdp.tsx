@@ -118,7 +118,7 @@ export default function SuggestedProducts({ currentId }: SuggestedProductsProps)
                 scrollSnapAlign: 'start',
               }}
             >
-              <ProductCard product={product} theme="dark" index={i} context="default" />
+              <ProductCard product={product} theme="dark" index={i} context="default" fluidWidth />
             </motion.div>
           ))}
         </div>

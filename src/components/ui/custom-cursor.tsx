@@ -8,16 +8,34 @@ export function CustomCursor() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [isMobile, setIsMobile] = useState(true);
   const pathname = usePathname();
   const isStudio = pathname?.startsWith("/studio");
+  const canUseCustomCursor =
+    typeof window !== "undefined" &&
+    (() => {
+      const ua = navigator.userAgent || "";
+      const hasFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+      const isTouchPrimary = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+      const isIpad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      return hasFinePointer && !isTouchPrimary && !isMobileUA && !isIpad;
+    })();
 
   useEffect(() => {
-    // Usamos pointer: fine para garantizar que los laptops con touch screen sí vean el cursor
-    const isFine = window.matchMedia("(pointer: fine)").matches;
-    setIsMobile(!isFine);
+    if (isStudio) {
+      document.body.classList.add("studio-env");
+      document.body.classList.remove("custom-cursor-enabled");
+      return;
+    }
 
-    if (!isFine) return;
+    document.body.classList.remove("studio-env");
+
+    if (!canUseCustomCursor) {
+      document.body.classList.remove("custom-cursor-enabled");
+      return;
+    }
+
+    document.body.classList.add("custom-cursor-enabled");
 
     const handleMouseMove = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
@@ -55,6 +73,7 @@ export function CustomCursor() {
     };
 
     const handleMouseOut = (e: MouseEvent) => {
+      void e;
       setHovered(false);
     };
 
@@ -63,21 +82,14 @@ export function CustomCursor() {
     window.addEventListener("mouseout", handleMouseOut);
 
     return () => {
+      document.body.classList.remove("custom-cursor-enabled");
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseover", handleMouseOver);
       window.removeEventListener("mouseout", handleMouseOut);
     };
-  }, []);
+  }, [canUseCustomCursor, isStudio]);
 
-  useEffect(() => {
-    if (isStudio) {
-      document.body.classList.add("studio-env");
-    } else {
-      document.body.classList.remove("studio-env");
-    }
-  }, [isStudio]);
-
-  if (isMobile || isStudio) return null;
+  if (!canUseCustomCursor || isStudio) return null;
 
   return (
     <>

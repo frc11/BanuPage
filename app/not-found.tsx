@@ -4,7 +4,7 @@ import Image from 'next/image'
 export default function NotFound() {
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: 'var(--app-vh)',
       background: 'var(--color-cream)',
       display: 'flex',
       flexDirection: 'column',

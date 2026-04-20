@@ -85,6 +85,7 @@
 
   --navbar-height: 121px;
   /* mobile: 36px topbar + 85px nav */
+  --app-vh: 100vh;
 }
 
 @media (min-width: 768px) {
@@ -99,6 +100,24 @@
     --spacing-section-top: clamp(3.5rem, 6vw, 5rem);
     --spacing-section-bottom: clamp(4rem, 8vw, 6rem);
     --spacing-section-x: clamp(0.75rem, 2.5vw, 3rem);
+  }
+}
+
+/* iOS/Android mobile browser UI (barra inferior/superior):
+   usar viewport estable para evitar saltos al ocultar/mostrar toolbars */
+@supports (height: 100svh) {
+  @media (pointer: coarse) {
+    :root {
+      --app-vh: 100svh;
+    }
+
+    .min-h-screen {
+      min-height: var(--app-vh) !important;
+    }
+
+    .h-screen {
+      height: var(--app-vh) !important;
+    }
   }
 }
 
@@ -192,9 +211,9 @@ body::after {
   background-size: 128px 128px;
 }
 
-/* Mejora 2: Ocultar cursor nativo en devices con mouse de precisión */
+/* Mejora 2: Ocultar cursor nativo solo cuando el custom cursor esté activo */
 @media (pointer: fine) {
-  body:not(.studio-env) * {
+  body.custom-cursor-enabled:not(.studio-env) * {
     cursor: none !important;
   }
 }
@@ -457,16 +476,57 @@ body::after {
 @media (max-width: 768px) {
   .pdp-grid {
     grid-template-columns: 1fr !important;
+    padding-top: var(--navbar-height) !important;
+    min-height: auto !important;
   }
 
   .pdp-grid>div:first-child {
     position: relative !important;
     height: 70vw !important;
     top: 0 !important;
+    margin-top: 0 !important;
   }
 
+  .pdp-info-column {
+    padding-top: clamp(0.75rem, 3vw, 1.25rem) !important;
+  }
+}
+
+@media (max-width: 1024px) {
   .suggested-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: auto !important;
+    scroll-snap-type: none !important;
+    padding-bottom: 0 !important;
+  }
+
+  .suggested-grid > * {
+    display: flex !important;
+    justify-content: center !important;
+    flex: 1 1 calc((100% - (2 * clamp(1rem, 2vw, 1.5rem))) / 3) !important;
+    width: calc((100% - (2 * clamp(1rem, 2vw, 1.5rem))) / 3) !important;
+    max-width: calc((100% - (2 * clamp(1rem, 2vw, 1.5rem))) / 3) !important;
+    min-width: 0 !important;
+    scroll-snap-align: unset !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .suggested-grid > * {
+    flex-basis: calc((100% - clamp(1rem, 2vw, 1.5rem)) / 2) !important;
+    width: calc((100% - clamp(1rem, 2vw, 1.5rem)) / 2) !important;
+    max-width: calc((100% - clamp(1rem, 2vw, 1.5rem)) / 2) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .suggested-grid > * {
+    flex-basis: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 

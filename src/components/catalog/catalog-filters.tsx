@@ -89,7 +89,7 @@ export default function CatalogFilters({
               top: 'var(--navbar-height)',
               right: 0,
               bottom: 0,
-              height: 'calc(100vh - var(--navbar-height))',
+              height: 'calc(var(--app-vh) - var(--navbar-height))',
               width: '320px',
               background: 'var(--color-cream)',
               zIndex: 'var(--z-drawer)',

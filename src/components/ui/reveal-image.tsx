@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 interface RevealImageProps {
@@ -20,9 +20,19 @@ interface RevealImageProps {
 export default function RevealImage({ 
   src, alt, width, height, fill, priority, className, delay = 0, unoptimized, style
 }: RevealImageProps) {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
-  const isInView = priority ? true : inView
+  const [forceVisible, setForceVisible] = useState(false)
+
+  useEffect(() => {
+    if (priority || inView) return
+
+    // Fallback defensivo: evita placeholders vacíos si IntersectionObserver falla
+    const timeoutId = window.setTimeout(() => setForceVisible(true), 1200)
+    return () => window.clearTimeout(timeoutId)
+  }, [inView, priority])
+
+  const isInView = Boolean(priority || inView || forceVisible)
 
   return (
     <motion.div

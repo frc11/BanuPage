@@ -89,7 +89,7 @@ export function ProductCard({
       className={`product-card group relative flex flex-col gap-1 bg-transparent shadow-none overflow-hidden p-[var(--spacing-card)] !rounded-[4px] ${isCatalogCard
           ? 'w-full min-w-0'
           : fluidWidth
-            ? 'w-full min-w-0 max-w-[320px]'
+            ? 'w-full min-w-0 max-w-[320px] mx-auto'
             : 'w-[220px] md:w-[280px] shrink-0'
         }`}
     >
