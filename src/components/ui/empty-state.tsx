@@ -22,7 +22,7 @@ export const EmptyState = ({
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '60vh',
+      minHeight: 'calc(var(--app-vh) * 0.6)',
       padding: '5rem 2rem',
       position: 'relative',
       width: '100%',

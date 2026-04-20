@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
@@ -8,40 +8,54 @@ export function CustomCursor() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [isMouseActive, setIsMouseActive] = useState(false);
+  const isMouseActiveRef = useRef(false);
   const pathname = usePathname();
   const isStudio = pathname?.startsWith("/studio");
-  const canUseCustomCursor =
+  const isCursorEligible =
     typeof window !== "undefined" &&
     (() => {
       const ua = navigator.userAgent || "";
-      const hasFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
-      const isTouchPrimary = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-      const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+      const hasFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches
+        || window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+      const hasAnyCoarsePointer = window.matchMedia("(pointer: coarse)").matches
+        || window.matchMedia("(any-pointer: coarse)").matches;
+      const isTouchDevice = navigator.maxTouchPoints > 0 || "ontouchstart" in window;
+      const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
       const isIpad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-      return hasFinePointer && !isTouchPrimary && !isMobileUA && !isIpad;
+      return hasFinePointer && !hasAnyCoarsePointer && !isTouchDevice && !isMobileUA && !isIpad;
     })();
 
   useEffect(() => {
-    if (isStudio) {
-      document.body.classList.add("studio-env");
-      document.body.classList.remove("custom-cursor-enabled");
-      return;
-    }
-
-    document.body.classList.remove("studio-env");
-
-    if (!canUseCustomCursor) {
-      document.body.classList.remove("custom-cursor-enabled");
-      return;
-    }
-
-    document.body.classList.add("custom-cursor-enabled");
+    if (isStudio || !isCursorEligible) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    const activateMouseCursor = () => {
+      if (!isMouseActiveRef.current) {
+        isMouseActiveRef.current = true;
+        setIsMouseActive(true);
+      }
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      setPos({ x: e.clientX, y: e.clientY });
+      activateMouseCursor();
+    };
+
+    const handleTouchStart = () => {
+      if (isMouseActiveRef.current) {
+        isMouseActiveRef.current = false;
+        setIsMouseActive(false);
+      }
+    };
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
 
     const checkHoverAttributes = (el: Element) => {
       // Helper function para verificar los selectores que piden hover interactivo
@@ -59,6 +73,7 @@ export function CustomCursor() {
     };
 
     const handleMouseOver = (e: MouseEvent) => {
+      if (!isMouseActiveRef.current) return;
       if (e.target && e.target instanceof Element) {
         if (checkHoverAttributes(e.target)) {
           setHovered(true);
@@ -74,6 +89,7 @@ export function CustomCursor() {
 
     const handleMouseOut = (e: MouseEvent) => {
       void e;
+      if (!isMouseActiveRef.current) return;
       setHovered(false);
     };
 
@@ -82,20 +98,42 @@ export function CustomCursor() {
     window.addEventListener("mouseout", handleMouseOut);
 
     return () => {
-      document.body.classList.remove("custom-cursor-enabled");
+      isMouseActiveRef.current = false;
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("mouseover", handleMouseOver);
       window.removeEventListener("mouseout", handleMouseOut);
     };
-  }, [canUseCustomCursor, isStudio]);
+  }, [isCursorEligible, isStudio]);
 
-  if (!canUseCustomCursor || isStudio) return null;
+  useEffect(() => {
+    if (isStudio) {
+      document.body.classList.add("studio-env");
+      document.body.classList.remove("custom-cursor-enabled");
+      return;
+    }
+
+    document.body.classList.remove("studio-env");
+
+    if (!isCursorEligible || !isMouseActive) {
+      document.body.classList.remove("custom-cursor-enabled");
+      return;
+    }
+
+    document.body.classList.add("custom-cursor-enabled");
+    return () => {
+      document.body.classList.remove("custom-cursor-enabled");
+    };
+  }, [isCursorEligible, isMouseActive, isStudio]);
+
+  if (!isCursorEligible || !isMouseActive || isStudio) return null;
 
   return (
     <>
       {/* DOT */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none"
+        className="custom-cursor-dot fixed top-0 left-0 rounded-full pointer-events-none"
         style={{
           width: 5,
           height: 5,
@@ -116,7 +154,7 @@ export function CustomCursor() {
 
       {/* RING */}
       <motion.div
-        className="fixed top-0 left-0 bg-transparent rounded-full pointer-events-none border"
+        className="custom-cursor-ring fixed top-0 left-0 bg-transparent rounded-full pointer-events-none border"
         style={{ zIndex: 'var(--z-cursor)' as unknown as number }}
         animate={{
           x: pos.x,

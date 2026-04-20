@@ -96,7 +96,7 @@ export function SelectionPageContent({ allFeatured }: SelectionPageContentProps)
       style={{
         minHeight: "var(--app-vh)",
         backgroundColor: "var(--color-cream)",
-        paddingTop: "86px",
+        paddingTop: "var(--navbar-height)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -118,7 +118,7 @@ export function SelectionPageContent({ allFeatured }: SelectionPageContentProps)
         </>
       ) : (
         /* Skeleton mínimo — misma altura que el empty state para evitar layout shift */
-        <div style={{ minHeight: "60vh" }} aria-hidden="true" />
+        <div style={{ minHeight: "calc(var(--app-vh) * 0.6)" }} aria-hidden="true" />
       )}
     </main>
   );

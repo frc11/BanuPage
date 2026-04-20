@@ -218,6 +218,18 @@ body::after {
   }
 }
 
+/* Candado mobile: nunca activar cursor custom en dispositivos táctiles */
+@media (pointer: coarse), (any-pointer: coarse) {
+  body.custom-cursor-enabled * {
+    cursor: auto !important;
+  }
+
+  .custom-cursor-dot,
+  .custom-cursor-ring {
+    display: none !important;
+  }
+}
+
 /* ========================================= */
 /* MEJORA 1 — SAFE AREAS Y ESPACIADO TÁCTIL   */
 /* ========================================= */

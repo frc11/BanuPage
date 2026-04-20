@@ -52,7 +52,10 @@ export function Hero({
   }, [currentIndex, activeVideos]);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[var(--color-dark)] py-[var(--spacing-section-y)]">
+    <section
+      className="relative w-full overflow-hidden flex flex-col items-center justify-center bg-[var(--color-dark)] py-[var(--spacing-section-y)]"
+      style={{ minHeight: 'var(--app-vh)', height: 'var(--app-vh)' }}
+    >
       <ArabicPatternOverlay opacity={0.07} color="light" className="z-0" />
 
       {activeVideos.length > 0 && (
