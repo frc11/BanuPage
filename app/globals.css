@@ -269,7 +269,7 @@ body::after {
 
 @media (pointer: fine) {
   ::-webkit-scrollbar {
-    width: 3px;
+    display: none;
   }
 
   ::-webkit-scrollbar-track {
@@ -285,7 +285,7 @@ body::after {
   }
 
   * {
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scrollbar-color: #8B7355 #EAE6DF;
   }
 }
