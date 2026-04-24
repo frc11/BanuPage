@@ -4,7 +4,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { BrandData } from '@/types/sanity'
 
-const TAGS = ['Calor','Frío','Diario','Noche','Cita','Modo Bestia','Sport','Elegante']
+const TAG_OPTIONS = [
+  { value: 'calor', label: 'CALOR' },
+  { value: 'frio', label: 'FRIO' },
+  { value: 'diario', label: 'DIARIO' },
+  { value: 'noche', label: 'NOCHE' },
+  { value: 'cita', label: 'CITA' },
+  { value: 'modo bestia', label: 'MODO BESTIA' },
+  { value: 'sport', label: 'SPORT' },
+  { value: 'elegante', label: 'ELEGANTE' },
+]
 
 interface FiltersState {
   searchQuery: string
@@ -24,9 +33,10 @@ interface CatalogFiltersProps {
 export default function CatalogFilters({ 
   brands, filters, onFiltersChange, filteredCount 
 }: CatalogFiltersProps) {
+  void filteredCount
   const [open, setOpen] = useState(false)
 
-  // Abrir desde el botón externo
+  // Abrir desde el boton externo
   useEffect(() => {
     const btn = document.getElementById('catalog-filter-btn')
     const handler = () => setOpen(true)
@@ -38,15 +48,15 @@ export default function CatalogFilters({
 
   const toggleBrand = (name: string) => {
     const next = filters.selectedBrands.includes(name)
-      ? filters.selectedBrands.filter(b => b !== name)
+      ? filters.selectedBrands.filter((b) => b !== name)
       : [...filters.selectedBrands, name]
     onFiltersChange({ ...filters, selectedBrands: next })
   }
 
-  const toggleTag = (tag: string) => {
-    const next = filters.selectedTags.includes(tag)
-      ? filters.selectedTags.filter(t => t !== tag)
-      : [...filters.selectedTags, tag]
+  const toggleTag = (tagValue: string) => {
+    const next = filters.selectedTags.includes(tagValue)
+      ? filters.selectedTags.filter((t) => t !== tagValue)
+      : [...filters.selectedTags, tagValue]
     onFiltersChange({ ...filters, selectedTags: next })
   }
 
@@ -54,7 +64,7 @@ export default function CatalogFilters({
     ...filters,
     selectedBrands: [],
     selectedTags: [],
-    onlyOnSale: false
+    onlyOnSale: false,
   })
 
   return (
@@ -74,7 +84,7 @@ export default function CatalogFilters({
               right: 0,
               bottom: 0,
               background: 'rgba(44,24,16,0.4)',
-              zIndex: 'var(--z-drawer-overlay)'
+              zIndex: 'var(--z-drawer-overlay)',
             }}
           />
 
@@ -94,23 +104,27 @@ export default function CatalogFilters({
               background: 'var(--color-cream)',
               zIndex: 'var(--z-drawer)',
               overflowY: 'auto',
-              padding: '2rem 1.5rem'
+              padding: '2rem 1.5rem',
             }}
           >
             {/* HEADER */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '2rem'
-            }}>
-              <p style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontSize: '0.65rem',
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'var(--color-dark)'
-              }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '2rem',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--font-dm-sans)',
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.3em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-dark)',
+                }}
+              >
                 Filtros {activeCount > 0 && `(${activeCount})`}
               </p>
               <button
@@ -128,8 +142,12 @@ export default function CatalogFilters({
                   transition: 'border-color 200ms ease, opacity 200ms ease',
                   opacity: 0.7,
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.7'; }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.opacity = '1'
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.opacity = '0.7'
+                }}
               >
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -137,45 +155,57 @@ export default function CatalogFilters({
 
             {/* MARCAS */}
             <div style={{ marginBottom: '2rem' }}>
-              <p style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontSize: '0.6rem',
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-                color: 'var(--color-dark)',
-                opacity: 0.4,
-                marginBottom: '1rem'
-              }}>Marca</p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-dm-sans)',
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-dark)',
+                  opacity: 0.4,
+                  marginBottom: '1rem',
+                }}
+              >
+                Marca
+              </p>
 
-              {brands.map(brand => (
-                <label key={brand._id} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.625rem 0',
-                  cursor: 'pointer',
-                  borderBottom: '1px solid rgba(44,24,16,0.06)'
-                }}>
-                  <div style={{
-                    width: 14, height: 14,
-                    border: '1px solid var(--color-dark)',
-                    background: filters.selectedBrands.includes(brand.name)
-                      ? 'var(--color-gold)'
-                      : 'transparent',
-                    flexShrink: 0,
-                    transition: 'background 200ms ease'
-                  }} />
+              {brands.map((brand) => (
+                <label
+                  key={brand._id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.625rem 0',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid rgba(44,24,16,0.06)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 14,
+                      height: 14,
+                      border: '1px solid var(--color-dark)',
+                      background: filters.selectedBrands.includes(brand.name)
+                        ? 'var(--color-gold)'
+                        : 'transparent',
+                      flexShrink: 0,
+                      transition: 'background 200ms ease',
+                    }}
+                  />
                   <input
                     type="checkbox"
                     checked={filters.selectedBrands.includes(brand.name)}
                     onChange={() => toggleBrand(brand.name)}
                     style={{ display: 'none' }}
                   />
-                  <span style={{
-                    fontFamily: 'var(--font-dm-sans)',
-                    fontSize: '0.8rem',
-                    color: 'var(--color-dark)'
-                  }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-dm-sans)',
+                      fontSize: '0.8rem',
+                      color: 'var(--color-dark)',
+                    }}
+                  >
                     {brand.name}
                   </span>
                 </label>
@@ -184,25 +214,31 @@ export default function CatalogFilters({
 
             {/* TAGS */}
             <div style={{ marginBottom: '2rem' }}>
-              <p style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontSize: '0.6rem',
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-                color: 'var(--color-dark)',
-                opacity: 0.4,
-                marginBottom: '1rem'
-              }}>Ocasión</p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-dm-sans)',
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-dark)',
+                  opacity: 0.4,
+                  marginBottom: '1rem',
+                }}
+              >
+                Ocasion
+              </p>
 
-              <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '0.5rem'
-              }}>
-                {TAGS.map(tag => (
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                }}
+              >
+                {TAG_OPTIONS.map(({ value, label }) => (
                   <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
+                    key={value}
+                    onClick={() => toggleTag(value)}
                     style={{
                       fontFamily: 'var(--font-dm-sans)',
                       fontSize: '0.65rem',
@@ -210,60 +246,69 @@ export default function CatalogFilters({
                       textTransform: 'uppercase',
                       padding: '0.375rem 0.75rem',
                       border: '1px solid',
-                      borderColor: filters.selectedTags.includes(tag)
+                      borderColor: filters.selectedTags.includes(value)
                         ? 'var(--color-gold)'
                         : 'rgba(44,24,16,0.2)',
-                      background: filters.selectedTags.includes(tag)
+                      background: filters.selectedTags.includes(value)
                         ? 'var(--color-gold)'
                         : 'transparent',
-                      color: filters.selectedTags.includes(tag)
+                      color: filters.selectedTags.includes(value)
                         ? 'var(--color-cream)'
                         : 'var(--color-dark)',
                       cursor: 'pointer',
-                      transition: 'all 250ms ease'
+                      transition: 'all 250ms ease',
                     }}
                   >
-                    {tag}
+                    {label}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* SOLO OFERTAS */}
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              cursor: 'pointer',
-              marginBottom: '2rem'
-            }}>
-              <div style={{
-                width: 14, height: 14,
-                border: '1px solid var(--color-dark)',
-                background: filters.onlyOnSale ? 'var(--color-gold)' : 'transparent',
-                transition: 'background 200ms ease'
-              }} />
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                cursor: 'pointer',
+                marginBottom: '2rem',
+              }}
+            >
+              <div
+                style={{
+                  width: 14,
+                  height: 14,
+                  border: '1px solid var(--color-dark)',
+                  background: filters.onlyOnSale ? 'var(--color-gold)' : 'transparent',
+                  transition: 'background 200ms ease',
+                }}
+              />
               <input
                 type="checkbox"
                 checked={filters.onlyOnSale}
-                onChange={e => onFiltersChange({ ...filters, onlyOnSale: e.target.checked })}
+                onChange={(e) => onFiltersChange({ ...filters, onlyOnSale: e.target.checked })}
                 style={{ display: 'none' }}
               />
-              <span style={{
-                fontFamily: 'var(--font-dm-sans)',
-                fontSize: '0.8rem',
-                color: 'var(--color-dark)'
-              }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-dm-sans)',
+                  fontSize: '0.8rem',
+                  color: 'var(--color-dark)',
+                }}
+              >
                 Solo ofertas
               </span>
             </label>
 
-            {/* FOOTER — solo si hay filtros activos */}
+            {/* FOOTER */}
             {activeCount > 0 && (
-              <div style={{
-                borderTop: '1px solid rgba(44,24,16,0.1)',
-                paddingTop: '1.5rem'
-              }}>
+              <div
+                style={{
+                  borderTop: '1px solid rgba(44,24,16,0.1)',
+                  paddingTop: '1.5rem',
+                }}
+              >
                 <button
                   onClick={clearAll}
                   style={{
@@ -276,7 +321,7 @@ export default function CatalogFilters({
                     border: 'none',
                     cursor: 'pointer',
                     opacity: 0.5,
-                    textDecoration: 'underline'
+                    textDecoration: 'underline',
                   }}
                 >
                   Limpiar filtros ({activeCount})

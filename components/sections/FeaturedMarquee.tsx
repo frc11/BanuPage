@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { PerfumeData } from '@/types/sanity';
 import { Marquee } from '@/components/ui/Marquee';
 import { ProductCard } from '@/components/ui/ProductCard';
@@ -23,10 +24,12 @@ export function FeaturedMarquee({ products }: FeaturedMarqueeProps) {
   }
 
   if (!perfumes || perfumes.length === 0) return null;
-  const useCarousel = perfumes.length >= MIN_PRODUCTS_FOR_CAROUSEL;
+  const featuredPerfumes = perfumes.filter((perfume) => perfume.isFeatured);
+  const visiblePerfumes = featuredPerfumes.length > 0 ? featuredPerfumes : perfumes;
+  const useCarousel = visiblePerfumes.length > MIN_PRODUCTS_FOR_CAROUSEL;
 
   return (
-    <section 
+    <section
       className="relative w-full bg-[var(--color-dark)]"
       style={{
         paddingTop: 'var(--spacing-section-top)',
@@ -50,7 +53,7 @@ export function FeaturedMarquee({ products }: FeaturedMarqueeProps) {
 
       {useCarousel ? (
         <Marquee speed={38} direction="left" align="start" className="hide-scrollbar [--marquee-gap:var(--spacing-card)] [--marquee-padding:0px]">
-          {perfumes.map((product, index) => (
+          {visiblePerfumes.map((product, index) => (
             <ProductCard
               key={product._id}
               product={product}
@@ -69,13 +72,13 @@ export function FeaturedMarquee({ products }: FeaturedMarqueeProps) {
             style={{
               width: '100%',
               display: 'grid',
-              gridTemplateColumns: `repeat(${perfumes.length}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${visiblePerfumes.length}, minmax(0, 1fr))`,
               gap: 'var(--spacing-card)',
               alignItems: 'start',
               justifyItems: 'center',
             }}
           >
-            {perfumes.map((product, index) => (
+            {visiblePerfumes.map((product, index) => (
               <ProductCard
                 key={product._id}
                 product={product}
@@ -90,6 +93,20 @@ export function FeaturedMarquee({ products }: FeaturedMarqueeProps) {
           </div>
         </div>
       )}
+
+      <div className="featured-cta-wrap flex w-full justify-center">
+        <Link
+          href="/catalogo"
+          className="cta-catalog"
+          style={{
+            animation: 'banu-cta-reveal 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.35s both',
+          }}
+        >
+          <span className="cta-catalog__label">
+            Ver Coleccion Completa
+          </span>
+        </Link>
+      </div>
     </section>
   );
 }

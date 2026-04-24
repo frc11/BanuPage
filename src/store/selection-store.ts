@@ -90,7 +90,7 @@ export const useSelectionStore = create<SelectionStore>()(
 
         const list = items
           .map((item) => {
-            const price = item.price > 0 ? ` — USD ${item.price}` : '';
+            const price = item.price > 0 ? ` — ARS ${item.price.toLocaleString("es-AR")}` : '';
             const brand = item.brand ? ` (${item.brand})` : '';
             return `· ${item.name}${brand}${price}`;
           })

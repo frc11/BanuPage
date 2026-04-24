@@ -100,7 +100,7 @@ export function SelectionMiniDrawer({ isOpen, onClose }: SelectionMiniDrawerProp
   }, [isOpen]);
 
   const formatPrice = (price: number) =>
-    price > 0 ? `USD ${price.toLocaleString("es-AR")}` : null;
+    price > 0 ? `ARS ${price.toLocaleString("es-AR")}` : null;
 
   return (
     <AnimatePresence>

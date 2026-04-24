@@ -369,7 +369,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       flexShrink: 0
                     }}>
                       {product.price?.basePrice 
-                        ? `USD ${product.price.basePrice.toLocaleString()}` 
+                        ? `ARS ${product.price.basePrice.toLocaleString("es-AR")}` 
                         : 'Consultar'}
                     </p>
                   </motion.button>

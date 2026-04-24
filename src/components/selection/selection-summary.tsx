@@ -128,7 +128,7 @@ export function SelectionSummary() {
               }}
             >
               {item.price > 0
-                ? `USD ${item.price.toLocaleString("es-AR")}`
+                ? `ARS ${item.price.toLocaleString("es-AR")}`
                 : "—"}
             </span>
           </div>
@@ -173,7 +173,7 @@ export function SelectionSummary() {
                 marginBottom: "0.5rem",
               }}
             >
-              USD {totalReferencial.toLocaleString("es-AR")}
+              ARS {totalReferencial.toLocaleString("es-AR")}
             </p>
 
             <p

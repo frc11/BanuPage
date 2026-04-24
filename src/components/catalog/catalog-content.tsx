@@ -23,6 +23,24 @@ interface FiltersState {
   sortBy: 'recommended' | 'price-asc' | 'price-desc' | 'newest'
 }
 
+const normalizeForCompare = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const toTagKey = (value: string) => {
+  const normalized = normalizeForCompare(value)
+  if (!normalized) return ''
+
+  // Alias defensivos para tags históricas/copiadas desde CMS
+  if (normalized.includes('modo bestia') || normalized === 'bestia') return 'modo bestia'
+  return normalized
+}
+
 const containerVariants = {
   hidden: {},
   visible: {
@@ -66,22 +84,43 @@ export default function CatalogContent({ products, brands }: CatalogContentProps
   }
 
   const filtered = useMemo(() => {
+    const selectedBrandKeys = new Set(filters.selectedBrands.map(normalizeForCompare))
+    const selectedTagKeys = filters.selectedTags.map(toTagKey).filter(Boolean)
+
     const base = products.filter((p) => {
       if (filters.searchQuery) {
-        const q = filters.searchQuery.toLowerCase()
-        if (!p.name.toLowerCase().includes(q) && !p.inspiredBy?.toLowerCase().includes(q)) {
+        const q = normalizeForCompare(filters.searchQuery)
+        const matchesName = normalizeForCompare(p.name || '').includes(q)
+        const matchesInspiredBy = normalizeForCompare(p.inspiredBy || '').includes(q)
+        const matchesBrand = normalizeForCompare(p.brand?.title || '').includes(q)
+        if (!matchesName && !matchesInspiredBy && !matchesBrand) {
           return false
         }
       }
 
       if (filters.selectedBrands.length > 0) {
-        if (!p.brand?.title || !filters.selectedBrands.includes(p.brand.title)) {
+        const productBrandKey = normalizeForCompare(p.brand?.title || '')
+        if (!productBrandKey || !selectedBrandKeys.has(productBrandKey)) {
           return false
         }
       }
 
       if (filters.selectedTags.length > 0) {
-        const hasAll = filters.selectedTags.every((t) => p.tags?.includes(t))
+        const rawTags = Array.isArray(p.tags) ? p.tags : []
+        const rawVibe = Array.isArray((p as { vibe?: string[] }).vibe) ? (p as { vibe?: string[] }).vibe || [] : []
+        const rawClima = Array.isArray((p as { clima?: string[] }).clima) ? (p as { clima?: string[] }).clima || [] : []
+        const rawBadge = typeof p.badge === 'string' ? [p.badge] : []
+        const tagPool = [...rawTags, ...rawVibe, ...rawClima, ...rawBadge]
+
+        const normalizedTagSet = new Set(
+          tagPool
+            .map((tag) => toTagKey(String(tag)))
+            .filter(Boolean)
+        )
+
+        const hasAll = selectedTagKeys.every((selectedTagKey) =>
+          normalizedTagSet.has(selectedTagKey)
+        )
         if (!hasAll) {
           return false
         }

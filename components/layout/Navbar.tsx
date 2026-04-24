@@ -172,7 +172,7 @@ export function Navbar() {
               opacity: 0.4,
             }}
           >
-            Respuesta en menos de 24hs
+            RESPUESTA INMEDIATA
           </span>
         </a>
       </div>

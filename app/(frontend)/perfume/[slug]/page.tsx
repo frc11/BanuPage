@@ -46,7 +46,7 @@ export async function generateMetadata({
   const product = mapSanityPerfume(rawProduct as never);
   const brandPrefix = product.brand?.title ? `${product.brand.title} · ` : "";
   const activePrice = product.price.isOnSale && product.price.discountPrice ? product.price.discountPrice : product.price.basePrice;
-  const priceStr = activePrice > 0 ? ` — USD ${activePrice}` : "";
+  const priceStr = activePrice > 0 ? ` — ARS ${activePrice.toLocaleString("es-AR")}` : "";
 
   return {
     title: `${product.name} | ${brandPrefix}Banū Scents`,
@@ -87,7 +87,7 @@ export default async function ProductPage({
     offers: {
       '@type': 'Offer',
       price: product.price?.basePrice ?? 0,
-      priceCurrency: 'USD',
+      priceCurrency: 'ARS',
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',

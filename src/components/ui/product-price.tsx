@@ -49,7 +49,7 @@ export default function ProductPrice({
           textDecorationColor: 'var(--color-gold)',
           fontWeight: 400
         }}>
-          USD {basePrice.toLocaleString('es-AR')}
+          ARS {basePrice.toLocaleString('es-AR')}
         </span>
         <span style={{
           fontFamily: 'var(--font-dm-sans), sans-serif',
@@ -57,7 +57,7 @@ export default function ProductPrice({
           color: 'var(--color-gold)',
           fontWeight: 500
         }}>
-          USD {discountPrice.toLocaleString('es-AR')}
+          ARS {discountPrice.toLocaleString('es-AR')}
         </span>
       </div>
     )
@@ -71,7 +71,7 @@ export default function ProductPrice({
       color,
       fontWeight: 400
     }}>
-      USD {basePrice.toLocaleString('es-AR')}
+      ARS {basePrice.toLocaleString('es-AR')}
     </span>
   )
 }

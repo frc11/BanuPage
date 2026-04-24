@@ -57,13 +57,6 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'stock',
-      title: 'Stock Disponible',
-      type: 'number',
-      group: 'commercial',
-      initialValue: 0,
-    }),
-    defineField({
       name: 'badge',
       title: 'Insignia (Ej: "BEST SELLER")',
       type: 'string',

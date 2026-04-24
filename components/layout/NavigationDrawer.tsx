@@ -78,10 +78,10 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 cursor-pointer"
-            style={{ 
-              background: 'rgba(44, 24, 16, 0.65)', 
+            style={{
+              background: 'rgba(44, 24, 16, 0.65)',
               backdropFilter: 'blur(4px)',
-              zIndex: 'var(--z-drawer-overlay)' 
+              zIndex: 'var(--z-drawer-overlay)'
             }}
             onClick={onClose}
             aria-hidden="true"
@@ -272,8 +272,8 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
                   style={{ color: 'var(--color-gold)', opacity: 0.6, flexShrink: 0 }}>
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                  <circle cx="12" cy="9" r="2.5"/>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                  <circle cx="12" cy="9" r="2.5" />
                 </svg>
                 <span style={{
                   fontFamily: 'var(--font-dm-sans)',
@@ -288,7 +288,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
               </div>
 
               {/* Socials + WhatsApp */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', columnGap: '0.85rem', rowGap: '0.65rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', flexWrap: 'wrap', columnGap: '0.85rem', rowGap: '0.65rem' }}>
                 {/* WhatsApp */}
                 <a
                   href="https://wa.me/5493814665503"
@@ -313,7 +313,7 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
 
                 {/* Instagram */}
                 <a
-                  href="https://instagram.com/banuscents"
+                  href="https://www.instagram.com/banu.scents"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
@@ -326,34 +326,14 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
                   onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.55'; }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
                   <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 'clamp(0.52rem, 1.7vw, 0.6rem)', letterSpacing: '0.11em', textTransform: 'uppercase' }}>
                     Instagram
                   </span>
                 </a>
 
-                {/* TikTok */}
-                <a
-                  href="https://tiktok.com/@banuscents"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="TikTok"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem',
-                    color: 'var(--color-cream)', opacity: 0.55,
-                    textDecoration: 'none', transition: 'opacity 200ms ease',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.55'; }}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.69a4.85 4.85 0 0 1-1.01-.0z"/>
-                  </svg>
-                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: 'clamp(0.52rem, 1.7vw, 0.6rem)', letterSpacing: '0.11em', textTransform: 'uppercase' }}>
-                    TikTok
-                  </span>
-                </a>
+
               </div>
             </motion.div>
           </motion.nav>

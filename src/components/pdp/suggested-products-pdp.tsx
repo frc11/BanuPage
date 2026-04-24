@@ -38,8 +38,7 @@ export default function SuggestedProducts({ currentId }: SuggestedProductsProps)
             // 2. Coincidencias olfativas y perceptivas (Vibe, Familia OLF, Clima)
             const commonTags = p.tags?.filter(t => currentProduct.tags?.includes(t)) || [];
             score += commonTags.length * 10;
-            
-            // 3. Afinidad de jerarquía de precio (Si están a <= USD 30 de diferencia)
+            // 3. Afinidad de jerarquía de precio (Si están a <= ARS 30 de diferencia)
             if (p.price?.basePrice && currentProduct.price?.basePrice) {
                if (Math.abs(p.price.basePrice - currentProduct.price.basePrice) <= 30) score += 5;
             }

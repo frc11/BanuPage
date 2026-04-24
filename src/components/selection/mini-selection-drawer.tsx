@@ -350,7 +350,7 @@ export function MiniSelectionDrawer() {
                             fontWeight: 500,
                           }}
                         >
-                          USD {item.price.toLocaleString("es-AR")}
+                          ARS {item.price.toLocaleString("es-AR")}
                         </p>
                       ) : (
                         <p

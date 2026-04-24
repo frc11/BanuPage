@@ -28,7 +28,6 @@ export const FEATURED_PRODUCTS_QUERY = `*[_type == "perfume"] | order(_createdAt
   clima,
   vibe,
   isFeatured, 
-  stock,
   "imageUrl": mainImage.asset->url, 
   "gallery": gallery[].asset->url, 
   "brand": brand->{ "title": name, "logoUrl": logo.asset->url }
@@ -65,7 +64,6 @@ export const PRODUCT_BY_SLUG_QUERY = `*[_type == "perfume" && slug.current == $s
   clima,
   vibe,
   isFeatured, 
-  stock,
   "imageUrl": mainImage.asset->url, 
   "gallery": gallery[].asset->url, 
   "brand": brand->{ "title": name, "logoUrl": logo.asset->url }
@@ -90,7 +88,6 @@ export const SUGGESTED_PRODUCTS_QUERY = `*[_type == "perfume" && isFeatured == t
   clima,
   vibe,
   isFeatured, 
-  stock,
   "imageUrl": mainImage.asset->url, 
   "gallery": gallery[].asset->url, 
   "brand": brand->{ "title": name, "logoUrl": logo.asset->url }
@@ -107,6 +104,8 @@ export const ALL_PRODUCTS_QUERY = `
     notes,
     performance,
     tags,
+    vibe,
+    clima,
     isFeatured,
     "imageUrl": mainImage.asset->url,
     "hoverImageUrl": gallery[0].asset->url,

@@ -177,21 +177,23 @@ export function ProductCard({
               <div
                 style={{
                   position: 'absolute',
-                  top: '0.625rem',
-                  left: '0.625rem',
+                  top: '0.75rem',
+                  right: '0.75rem',
                   background: 'var(--color-dark)',
-                  padding: '0.25rem 0.5rem',
-                  zIndex: 3,
+                  padding: '0.3rem 0.65rem',
+                  zIndex: 4,
                   pointerEvents: 'none',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
                 }}
               >
                 <span
                   style={{
                     fontFamily: 'var(--font-dm-sans)',
                     fontSize: '0.55rem',
-                    letterSpacing: '0.12em',
-                    color: 'var(--color-gold)',
-                    fontWeight: 500,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: '#fff',
+                    fontWeight: 600,
                   }}
                 >
                   -{discountPct}%
@@ -297,7 +299,7 @@ export function ProductCard({
                     opacity: 0.4,
                   }}
                 >
-                  USD {product.price.basePrice.toLocaleString()}
+                  ARS {product.price.basePrice.toLocaleString("es-AR")}
                 </span>
                 <span
                   style={{
@@ -307,7 +309,7 @@ export function ProductCard({
                     fontWeight: 500,
                   }}
                 >
-                  USD {product.price.discountPrice.toLocaleString()}
+                  ARS {product.price.discountPrice.toLocaleString("es-AR")}
                 </span>
               </div>
             ) : (
@@ -319,7 +321,7 @@ export function ProductCard({
                 }}
               >
                 {product.price?.basePrice
-                  ? `USD ${product.price.basePrice.toLocaleString()}`
+                  ? `ARS ${product.price.basePrice.toLocaleString("es-AR")}`
                   : 'Consultar'}
               </p>
             )

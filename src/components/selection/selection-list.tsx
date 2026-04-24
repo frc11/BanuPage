@@ -160,7 +160,7 @@ export function SelectionList() {
                       marginTop: "0.5rem",
                     }}
                   >
-                    USD {item.price.toLocaleString("es-AR")}
+                    ARS {item.price.toLocaleString("es-AR")}
                   </p>
                 ) : (
                   <p

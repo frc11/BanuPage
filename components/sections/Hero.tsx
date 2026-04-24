@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArabicPatternOverlay } from '@/components/ui/ArabicPattern';
 import RevealText from '@/src/components/ui/reveal-text';
@@ -16,25 +15,12 @@ export interface HeroProps {
   showContent?: boolean;
 }
 
-const copyVariants = {
-  hidden: { opacity: 0, y: 28 },
-  visible: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.9,
-      ease: [0.25, 0.1, 0.25, 1] as const,
-      delay,
-    },
-  }),
-};
-
 export function Hero({
   title,
   subtitle,
   videoUrls = [],
-  ctaText = 'DESCUBRIR',
-  ctaLink = '#explore',
+  ctaText = 'Ver Catálogo',
+  ctaLink = '/catalogo',
   showContent = true,
 }: HeroProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -112,28 +98,32 @@ export function Hero({
                 delay={0.65}
               />
             )}
-
-            <motion.div
-              custom={1}
-              variants={copyVariants}
-              initial="hidden"
-              animate="visible"
-              className="flex justify-center"
-            >
-              <Link
-                href={ctaLink}
-                className="group relative inline-flex items-center justify-center border border-[var(--color-cream)]/30 text-[var(--color-cream)] bg-transparent px-14 py-4 font-sans text-[0.7rem] tracking-[0.3em] uppercase transition-all duration-500 hover:border-[var(--color-cream)]"
-              >
-                <div className="absolute inset-0 bg-[var(--color-cream)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                <span className="relative z-10 group-hover:text-[var(--color-dark)] transition-colors duration-300">
-                  {ctaText}
-                </span>
-              </Link>
-            </motion.div>
           </div>
         </div>
       )}
 
+      {ctaText && ctaLink && (
+        <motion.div
+          className="absolute left-1/2 z-20 -translate-x-1/2"
+          style={{ bottom: 'clamp(6rem, 12vh, 8.5rem)' }}
+          initial={{ opacity: 0, y: 18, clipPath: 'inset(0 0 100% 0)' }}
+          animate={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
+          transition={{
+            delay: showContent ? 1.15 : 0.8,
+            duration: 0.9,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
+        >
+          <Link
+            href={ctaLink}
+            className="cta-catalog cta-catalog--over-media"
+          >
+            <span className="cta-catalog__label">
+              {ctaText}
+            </span>
+          </Link>
+        </motion.div>
+      )}
 
       {showContent && (
         <motion.div

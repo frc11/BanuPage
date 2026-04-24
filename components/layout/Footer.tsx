@@ -21,7 +21,7 @@ const NAV_LINKS = {
 const WHATSAPP_URL =
   'https://wa.me/5493814665503?text=Hola%20Ban%C5%AB%2C%20quiero%20suscribirme%20a%20las%20novedades';
 const WHATSAPP_CHAT = 'https://wa.me/5493814665503';
-const INSTAGRAM_URL = 'https://instagram.com';
+const INSTAGRAM_URL = 'https://www.instagram.com/banu.scents';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
