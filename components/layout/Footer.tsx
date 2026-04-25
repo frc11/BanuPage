@@ -7,14 +7,14 @@ import { BanuLogo } from '@/components/ui/BanuLogo';
 
 const NAV_LINKS = {
   ayuda: [
-    { label: 'Contacto', href: '#' },
-    { label: 'FAQ', href: '#' },
-    { label: 'Devoluciones', href: '#' },
+    { label: 'Contacto', href: 'https://wa.me/5493814665503' },
+    { label: 'FAQ', href: '/#faq' },
+    { label: 'Devoluciones', href: 'https://wa.me/5493814665503?text=Hola%20Banu%2C%20necesito%20ayuda%20con%20una%20devolucion.%0A%0A1%29%20Numero%20de%20pedido%3A%0A2%29%20Producto%20que%20queres%20devolver%3A%0A3%29%20Motivo%20de%20la%20devolucion%3A%0A4%29%20Estado%20actual%20del%20producto%3A%0A5%29%20Fecha%20de%20compra%3A' },
   ],
   empresa: [
-    { label: 'Sobre Nosotros', href: '#' },
-    { label: 'Términos y Condiciones', href: '#' },
-    { label: 'Política de Privacidad', href: '#' },
+    { label: 'Sobre Nosotros', href: '/nosotros' },
+    { label: 'Términos y Condiciones', href: '/terminos-y-condiciones' },
+    { label: 'Política de Privacidad', href: '/politica-de-privacidad' },
   ],
 };
 
@@ -38,7 +38,7 @@ export function Footer() {
     >
       <ArabicPatternOverlay opacity={0.04} color="light" />
 
-      {/* Línea superior */}
+      {/* Linea superior */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '1px', background: 'rgba(139,115,85,0.3)' }} />
 
       {/* Contenido principal */}
@@ -73,11 +73,11 @@ export function Footer() {
               textAlign: 'center',
             }}
           >
-            Perfumes Árabes · Argentina
+            {'Perfumes \u00c1rabes \u00b7 Argentina'}
           </span>
         </div>
 
-        {/* Línea divisoria */}
+        {/* Linea divisoria */}
         <div style={{ width: '100%', height: '1px', background: 'rgba(234,230,223,0.08)', marginBottom: '3.5rem' }} />
 
         {/* Grid: 3 columnas */}
@@ -276,7 +276,7 @@ export function Footer() {
               color: 'rgba(234,230,223,0.28)',
             }}
           >
-            © {currentYear} Banū Scents
+            {'\u00a9'} {currentYear} {' Ban\u016b Scents'}
           </span>
           <span
             style={{

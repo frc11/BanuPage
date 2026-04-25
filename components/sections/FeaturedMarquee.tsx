@@ -68,27 +68,19 @@ export function FeaturedMarquee({ products }: FeaturedMarqueeProps) {
         </Marquee>
       ) : (
         <div className="w-full">
-          <div
-            style={{
-              width: '100%',
-              display: 'grid',
-              gridTemplateColumns: `repeat(${visiblePerfumes.length}, minmax(0, 1fr))`,
-              gap: 'var(--spacing-card)',
-              alignItems: 'start',
-              justifyItems: 'center',
-            }}
-          >
+          <div className="featured-products-grid">
             {visiblePerfumes.map((product, index) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                showPerformance={false}
-                index={index}
-                showButton={false}
-                showTags={false}
-                priority={index < 3}
-                fluidWidth
-              />
+              <div key={product._id} className="featured-products-item">
+                <ProductCard
+                  product={product}
+                  showPerformance={false}
+                  index={index}
+                  showButton={false}
+                  showTags={false}
+                  priority={index < 3}
+                  fluidWidth
+                />
+              </div>
             ))}
           </div>
         </div>

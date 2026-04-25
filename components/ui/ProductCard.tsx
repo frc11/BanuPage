@@ -202,7 +202,7 @@ export function ProductCard({
             )}
 
             {/* Hover CTA — desliza desde abajo al hacer hover en la imagen */}
-            <div className="product-card-cta absolute bottom-0 left-0 right-0 z-[5]">
+            {showButton && (<div className="product-card-cta absolute bottom-0 left-0 right-0 z-[5]">
               <button
                 onClick={handleAdd}
                 aria-label={isInSelection ? `Quitar ${product.name}` : `Agregar ${product.name} a mi selección`}
@@ -241,7 +241,7 @@ export function ProductCard({
               >
                 {isInSelection ? '✓ En mi selección' : '+ Agregar a mi selección'}
               </button>
-            </div>
+            </div>)}
           </div>
         ) : (
           <div className="relative w-full aspect-[3/4] bg-[var(--color-cream-dark)] flex items-center justify-center overflow-hidden">

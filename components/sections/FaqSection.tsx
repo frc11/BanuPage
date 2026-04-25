@@ -29,8 +29,16 @@ export function FaqSection({ faqItems, theme = 'dark' }: FaqSectionProps) {
 
   return (
     <section
+      id="faq"
       className="relative w-full"
-      style={{ paddingTop: 'var(--spacing-section-top)', paddingBottom: 'var(--spacing-section-bottom)', paddingLeft: 'var(--spacing-section-x)', paddingRight: 'var(--spacing-section-x)', background: bg }}
+      style={{
+        paddingTop: 'var(--spacing-section-top)',
+        paddingBottom: 'var(--spacing-section-bottom)',
+        paddingLeft: 'var(--spacing-section-x)',
+        paddingRight: 'var(--spacing-section-x)',
+        background: bg,
+        scrollMarginTop: 'calc(var(--navbar-height) + 1rem)',
+      }}
     >
       <ArabicPatternOverlay opacity={0.04} color={isLight ? 'dark' : 'light'} />
       {/* Línea decorativa superior */}
